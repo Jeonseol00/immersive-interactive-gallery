@@ -1,82 +1,431 @@
-# FRONTEND IMPLEMENTATION GUIDE (SDD)
+# SOFTWARE DESIGN DOCUMENT (SDD) — REVISI 2.0
 **Proyek:** Immersive Interactive Gallery  
-**Fase:** Eksekusi Tahap 2 (Frontend & UI/UX Integration)  
-**Dokumen Target:** Frontend Engineering Team  
-**Status:** FINAL - *Strict Implementation Guidelines*
+**Nama Kode:** ARTELAB VOL. 3 — MIRAGE  
+**Fase:** Eksekusi Tahap 2 (Frontend & UI/UX Integration) — *Post-Refactor*  
+**Tanggal:** 2 April 2026  
+**Status:** ✅ FINAL — *Arsitektur Stabil, Siap Produksi*
 
 ---
 
-## 1. Executive Summary & Core Paradigm
+## 1. Ringkasan Eksekutif
 
-Dokumen ini adalah spesifikasi arsitektur (*Software Design Document*) khusus untuk tim Frontend. Backend telah selesai dibangun dan siap dikonsumsi. Tugas tim Frontend adalah membangun antarmuka imersif, interaktif, dan berkinerja tinggi tanpa kompromi.
+Dokumen ini adalah **Software Design Document (SDD)** revisi terkini yang mencerminkan kondisi *codebase* aktual setelah dua kali iterasi mayor. Semua artefak teknis yang direferensikan di sini telah **diimplementasikan dan diverifikasi** — bukan rencana, melainkan dokumentasi dari sistem yang sudah berjalan.
 
-> [!WARNING]
-> **Paradigma Mutlak: Mobile-First & Zero-Hover di Perangkat Sentuh**
-> Mulailah *coding* dari resolusi 320px. **DILARANG KERAS** menggunakan interaksi *hover* (seperti `onMouseEnter`) yang mengubah *state* DOM pada perangkat *mobile*. Semua interaksi *mobile* harus dipetakan ke *Tap/Click*. Interaksi *hover* mewah hanya boleh dieksekusi setelah *breakpoint* `md:` (Tailwind 768px).
+### 1.1 Perubahan Kunci dari SDD v1.0
 
----
-
-## 2. Tech Stack & Ekosistem Terpilih
-
-Tim diwajibkan menggunakan ekosistem berikut. Dilarang memasukkan *library* pihak ketiga tambahan yang mencemari *bundle size* tanpa persetujuan *Tech Lead*.
-
-*   **Core:** Next.js 15 (App Router, Server & Client Components)
-*   **Styling:** Tailwind CSS (Utility-first)
-*   **State Management:** Zustand (Untuk mengelola *state* UI global, misal: *active gallery ID*)
-*   **Layout Animations:** Framer Motion (Eksklusif untuk perpindahan rute dan eksekusi `layoutId`)
-*   **Scroll & Parallax:** GSAP & Lenis (Untuk membajak *scroll* menjadi mulus dan melakukan komputasi paralaks berbasis *ScrollTrigger*)
+| Aspek | SDD v1.0 | SDD v2.0 (Ini) |
+|---|---|---|
+| Homepage Architecture | `HeroSection` + `GalleryGrid` (terpisah) | `ImmersiveHomepage` monolitik tunggal |
+| Mobile Strategy | Accordion tersembunyi + thumbnail kecil | **Curated Vertical Feed** layar penuh |
+| Desktop Strategy | Grid statis 3 kolom | **Interactive Hover-Swap Index + Scattered Gallery** |
+| Image Assets | URL placeholder dummy | 9 foto beresolusi tinggi (`public/images/`) |
+| Background Grid | SVG statis | CSS Linear Gradient + Keyframe `flowGrid` animasi |
+| Menu Mobile | `translate-x` toggle | Framer Motion `AnimatePresence` + `staggerChildren` |
 
 ---
 
-## 3. Integrasi Backend & Konsumsi Data
+## 2. Ekosistem Teknologi
 
-Sistem *Backend* (Route Handlers) sudah menghasilkan tipe data JSON mutakhir.
-*   **Endpoint Global:** `GET /api/gallery?page=1&limit=10`
-*   **Endpoint Detail:** `GET /api/gallery/[slug]`
-*   **Antarmuka Tipe (TypeScript):** Gunakan dan *import* dari `src/types/index.ts`.
+### 2.1 Dependensi Produksi
 
-> [!IMPORTANT]
-> Backend telah mengirim properti kritikal berupa object `dimensions` (width, height, aspectRatio) dan boolean `isLCP` pada setiap objek array. Frontend **WAJIB** mengekstrak parameter ini dan memasukkannya ke komponen `next/image` untuk mencegah *Cumulative Layout Shift* (CLS). Jika data berstatus `isLCP: true`, komponen `<Image priority={true} />` wajib diaktifkan.
+| Library | Versi | Fungsi |
+|---|---|---|
+| `next` | 16.2.2 | Framework SSR/SSG. App Router, Server Components, Route Handlers |
+| `react` / `react-dom` | 19.2.4 | UI Runtime |
+| `framer-motion` | ^11.15.0 | Shared Element Transition (`layoutId`), `AnimatePresence`, stagger orchestration |
+| `gsap` | ^3.12.5 | GSAP Core untuk animasi floating, parallax `ScrollTrigger` |
+| `lenis` | ^1.1.18 | Smooth scroll engine (membajak native scroll menjadi buttery-smooth) |
+| `zustand` | ^5.0.2 | State management ringan (menu open/close, active gallery ID) |
+| `lucide-react` | ^0.469.0 | Ikon vektor (Menu, X, ArrowLeft) |
+| `clsx` + `tailwind-merge` | ^2.x | Utility penggabung class Tailwind secara aman |
 
----
+### 2.2 Dependensi Pengembangan
 
-## 4. Spesifikasi Fisik & Arsitektur Komponen
-
-Struktur folder Frontend akan dipusatkan di `src/components/` dengan metodologi *Atomic-ish*:
-1.  **`ui/`**: Komponen mikro (*Button, ParallaxImage, SmoothScrollWrapper, HoverAccordion*).
-2.  **`layout/`**: Pembungkus makro global (*Navbar, Footer, ModalOverlay*).
-3.  **`sections/`**: Blok raksasa pembentuk halaman (*GalleryGrid, HeroSection, InteractiveTabs*).
-
----
-
-## 5. Pedoman Rekayasa Animasi (Animation Engineering)
-
-Kunci ekselensi proyek ini terletak pada 60FPS (*Frames per Second*) transisi yang ditawarkan. Tim Frontend harus mematuhi tiga lapis aturan di baewah:
-
-### 5.1 Shared Element Transition (Framer Motion)
-Saat pengguna menekan thumbnail di `/`, gambar tersebut harus "terbang" dan melebar menjadi gambar *Hero* di rute `/gallery/[slug]`.
-*   **Instruksi:** Gunakan `<motion.img layoutId={"gallery-image-" + id} />` di kedua komponen (Grid & Hero) agar Framer Motion tahu itu adalah elemen yang sama.
-*   **Kewajiban Performa:** Anda HANYA BOLEH membiarkan Framer menganimasikan kalkulasi `transform` (GPU-accelerated). Jangan pernah merancang CSS yang membuat animasi memodifikasi properti `width` atau `height` pada elemen yang sedang bertransisi, karena akan memicu *CPU Layout Thrashing*.
-
-### 5.2 Immersive Smooth Scroll (Lenis + GSAP)
-Terapkan Lenis pada `layout.tsx` atau komponen *wrapper* teratas agar fungsi gulir (*scroll*) di Desktop terasa mewah.
-*   **Paralaks GSAP:** Elemen `<ParallaxImage>` wajib memiliki pembungkus dengan CSS `overflow: hidden`. Gambar `<motion.img>` di dalamnya akan diatur `scale: 1.1`, dan terikat komputasi *ScrollTrigger* `.to(y: "...")` dengan nilai kecepatan yang dipasok langsung dari respons Backend (`interaction.parallaxSpeed`).
-*   **Degradasi Seluler:** Jika `window.innerWidth < 768px`, matikan atau kecilkan nilai paralaks GSAP secara signifikan agar baterai ponsel pengguna tidak terkuras terbakar (*Graceful Degradation*).
-
-### 5.3 Dynamic Hover Ecosystem
-*   Untuk komponen seperti akordion tab gambar ganda:
-    *   **Desktop:** Gunakan `onMouseEnter` / `onMouseLeave` untuk memindahkan kelas CSS aktif.
-    *   **Mobile:** Gunakan `onClick` dan susun elemen secara vertikal, bukan menyamping, untuk menghindari *clipping* teks.
+| Library | Versi | Fungsi |
+|---|---|---|
+| `tailwindcss` | ^4 | CSS Utility-first engine |
+| `@tailwindcss/postcss` | ^4 | PostCSS integration |
+| `typescript` | ^5 | Tipe statis |
+| `eslint` + `eslint-config-next` | ^9 / 16.2.2 | Linting |
 
 ---
 
-## 6. Audit & Performa Aksesibilitas
+## 3. Arsitektur Sistem
 
-Sebagai pengembang kelas dunia, aksesibilitas tidak boleh dikorbankan demi estetik.
+### 3.1 Peta Direktori Aktif
 
-*   **훅 (Hook) Deteksi Aksesibilitas:** Buat *custom hook* `useReducedMotion()`. Jika `window.matchMedia('(prefers-reduced-motion: reduce)')` bernilai true, SELURUH durasi animasi Framer Motion dan efek paralaks GSAP wajib diganti menjadi instan (`duration: 0` atau nonaktif kodenya).
-*   **Manajemen Memori DOM:** Gambar di-*render* secara *lazy* secara bawaan kecuali yang ditandai `isLCP`. Untuk elemen panjang ke bawah, pertimbangkan virualisasi (opsional) atau matikan *listener* GSAP pada elemen yang sudah terlalu jauh tertinggal di atas *viewport viewport*.
+```
+src/
+├── app/
+│   ├── layout.tsx              # Root Layout (SmoothScrollWrapper + Navbar)
+│   ├── page.tsx                # Homepage entry → <ImmersiveHomepage />
+│   ├── globals.css             # Design tokens, flowGrid keyframe
+│   ├── api/
+│   │   └── gallery/
+│   │       └── route.ts        # GET /api/gallery — paginated mock data
+│   └── gallery/
+│       └── [slug]/
+│           ├── page.tsx        # Detail page Server Component
+│           └── GalleryDetailClient.tsx  # Detail page Client Component
+├── components/
+│   ├── layout/
+│   │   ├── Navbar.tsx          # Fixed header + Staggered mobile overlay
+│   │   └── SmoothScrollWrapper.tsx  # Lenis + GSAP ScrollTrigger bridge
+│   ├── sections/
+│   │   ├── ImmersiveHomepage.tsx     # ⭐ KOMPONEN UTAMA — Split-Render Engine
+│   │   └── HeroSection.tsx          # [DEPRECATED] Tidak lagi dipakai di page.tsx
+│   └── ui/
+│       ├── GalleryItem.tsx          # [DORMANT] Card individual (tidak dipakai di homepage baru)
+│       ├── ParallaxImage.tsx        # Gambar + GSAP ScrollTrigger parallax
+│       └── HoverAccordion.tsx       # Accordion interaktif (dipakai di halaman detail)
+├── hooks/
+│   └── use-reduced-motion.ts   # Deteksi preferensi aksesibilitas pengguna
+├── lib/
+│   ├── api.ts                  # Fetch wrapper (fetchGalleryItems, fetchGalleryItemBySlug)
+│   ├── data.ts                 # Mock data — 9 entri dengan foto asli
+│   ├── store.ts                # Zustand global store
+│   └── utils.ts                # cn() — clsx + tailwind-merge
+└── types/
+    └── index.ts                # Interface TypeScript (GalleryItem, GalleryImage, dll.)
+```
+
+### 3.2 Diagram Alur Data
+
+```mermaid
+graph TD
+    A["page.tsx (Server Component)"] --> B["fetchGalleryItems()"]
+    B --> C["GET /api/gallery"]
+    C --> D["mockGalleryData (data.ts)"]
+    D --> C
+    C --> B
+    B --> A
+    A --> E["<ImmersiveHomepage items={items} />"]
+    
+    E --> F{"isMobile?"}
+    F -->|"true (< 768px)"| G["Mobile: Curated Vertical Feed"]
+    F -->|"false (≥ 768px)"| H["Desktop: Interactive Hover-Swap Index"]
+    
+    G --> I["Link → /gallery/slug"]
+    H --> I
+    I --> J["GalleryDetailClient"]
+    J --> K["Shared Element Transition (layoutId)"]
+```
 
 ---
-**PENGESAHAN:**
-Silakan pelajari pedoman teknis ini. Dengan diterimanya dokumen ini, proses fase Integrasi *Frontend* resmi dimulai. Jika ada kebingungan logika status antara Zustand dan Transisi rute Next.js, jadwalkan sesi tinjauan dengan *Tech Lead* atau *Architect*.
+
+## 4. Spesifikasi Komponen
+
+### 4.1 `ImmersiveHomepage.tsx` — Jantung Aplikasi
+
+**Lokasi:** `src/components/sections/ImmersiveHomepage.tsx`  
+**Tipe:** Client Component (`"use client"`)  
+**Peran:** Komponen monolitik yang me-*render* dua mode tampilan berdasarkan ukuran layar.
+
+#### State Internal
+
+| State | Tipe | Default | Fungsi |
+|---|---|---|---|
+| `activeIndex` | `number` | `0` | Indeks item galeri yang sedang aktif/dipilih |
+| `isMobile` | `boolean` | `true` | Deteksi breakpoint (< 768px). Default `true` untuk mencegah *flash of desktop content* di SSR |
+
+#### Mode Render: Mobile (< 768px)
+
+```
+┌─────────────────────────────┐
+│         NAVBAR              │
+├─────────────────────────────┤
+│  ┌───────────────────────┐  │
+│  │                       │  │
+│  │     FOTO BESAR        │  │ ← aspect-[3/4], rounded-[2rem]
+│  │     (Tap to View)     │  │ ← layoutId="gallery-image-{id}"
+│  │                       │  │
+│  └───────────────────────┘  │
+│  Category • JUDUL TEBAL     │
+│  Deskripsi singkat...       │
+│                             │
+│  ┌───────────────────────┐  │
+│  │                       │  │
+│  │     FOTO BESAR #2     │  │
+│  │                       │  │ ← gap-24 antar item
+│  └───────────────────────┘  │
+│  Category • JUDUL TEBAL     │
+│  ...dst (9 item total)      │
+└─────────────────────────────┘
+```
+
+**Perilaku:**
+- Setiap foto membentang penuh layar (`w-full aspect-[3/4]`).
+- Lencana `"Tap to View"` muncul di pojok kanan atas setiap foto.
+- TAP foto → navigasi ke `/gallery/[slug]` via `<Link>` dengan Shared Element Transition (`layoutId`).
+- Grid animasi *flowing lines* terpasang sebagai `fixed` background di belakang seluruh feed.
+- **TIDAK ADA** interaksi `onMouseEnter` di mode ini (kepatuhan SDD v1 Pasal 1 — *Zero Hover di Perangkat Sentuh*).
+
+#### Mode Render: Desktop (≥ 768px)
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  NAVBAR                                                   │
+├────────────────┬─────────────────────────────────────────┤
+│                │          ┌────┐                          │
+│ Works / Mirage │    ┌─────┤IMG │   ┌────┐                │ ← Scattered
+│                │    │ IMG ├────┘   │IMG │                 │    ambient images
+│ VIVID DIMENS.. │    └─────┘       └────┘                 │    (GSAP floating)
+│ CLASSICAL AU.. │                                          │
+│ ▓ETERNAL GAZE▓ │    ┌──────────────────────────┐         │
+│ MYTHIC LORE    │    │                          │         │ ← Focal Image
+│ KNOWLEDGE VA.. │    │      GAMBAR UTAMA         │         │    (hover-swap)
+│ EUROPEAN CH..  │    │      (16:10 ratio)        │         │
+│ SERENE PASS..  │    │                          │         │
+│ WINTER MIRAGE  │    └──────────────────────────┘         │
+│ CITY ECHOES    │               ↑ Klik = Detail Page      │
+│                │                                          │
+│ Hover & Click  │                                          │
+└────────────────┴─────────────────────────────────────────┘
+```
+
+**Perilaku:**
+- **Left Panel (1/3):** Daftar vertikal nama proyek. `onMouseEnter` → langsung `setActiveIndex(idx)` tanpa klik. Item aktif ditandai border kuning + indent kiri. `onClick` → navigasi ke halaman detail.
+- **Right Panel (2/3):** Focal image raksasa (`aspect-[16/10]`) berganti via `AnimatePresence mode="wait"` dengan transisi `blur(15px) + x:80 → blur(0) + x:0`. Hover pada gambar memunculkan overlay informasi + tombol "Explorasi".
+- **Background:** 4 gambar tersebar (*scattered*) yang berubah dinamis sesuai `activeIndex`, melayang mengambang via GSAP `y/x/rotation random` yoyo.
+
+### 4.2 `Navbar.tsx` — Navigasi Global
+
+**Lokasi:** `src/components/layout/Navbar.tsx`  
+**Tipe:** Client Component
+
+| Fitur | Desktop | Mobile |
+|---|---|---|
+| Posisi | `fixed top-0`, `backdrop-blur-md bg-black/40` | Sama |
+| Menu | Horizontal links inline + tombol CTA | Hamburger icon (`Menu`/`X`) |
+| Overlay | — | `AnimatePresence` + `motion.div` fullscreen |
+| Animasi Menu | — | `staggerChildren: 0.1`, `delayChildren: 0.2`, slide-up per item |
+| Item Menu | Galeri, Tentang Kami, Hubungi (CTA putih) | Galeri, Kampanye, Tentang Kami, Hubungi |
+
+**State:** Menggunakan Zustand store (`useStore`) untuk `isMenuOpen` / `setIsMenuOpen`.
+
+### 4.3 `GalleryDetailClient.tsx` — Halaman Detail Proyek
+
+**Lokasi:** `src/app/gallery/[slug]/GalleryDetailClient.tsx`  
+**Tipe:** Client Component
+
+**Fitur Utama:**
+- **Hero Image:** `motion.create(Image)` dengan `layoutId="gallery-image-{id}"` — menerima elemen transisi dari homepage (Shared Element / Magic Motion).
+- **Spring Physics:** `type: "spring", stiffness: 300, damping: 30` — memberikan feel fisik saat gambar "mendarat" di posisi hero.
+- **Navigasi Kembali:** Tombol `<ArrowLeft>` di pojok kiri atas.
+- **Content:** Metadata (Author, Date), dan `<HoverAccordion>` dengan 3 tab konteks (Manifesto, Filosofi Desain, Teknik Visual).
+
+### 4.4 `SmoothScrollWrapper.tsx` — Smooth Scroll Engine
+
+**Lokasi:** `src/components/layout/SmoothScrollWrapper.tsx`
+
+**Konfigurasi Lenis:**
+```typescript
+{
+  duration: 1.2,
+  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),  // Exponential ease-out
+  orientation: "vertical",
+  smoothWheel: true,
+  wheelMultiplier: 1,
+  touchMultiplier: 2     // Lebih responsif di perangkat sentuh
+}
+```
+
+**Bridge ke GSAP:** Setiap frame `requestAnimationFrame`, Lenis memperbarui posisi scroll, lalu `ScrollTrigger.update()` dipanggil agar semua animasi berbasis scroll tetap sinkron.
+
+**Degradasi Aksesibilitas:** Jika `useReducedMotion()` bernilai `true`, Lenis tidak diinisialisasi sama sekali; scroll kembali ke perilaku bawaan browser.
+
+### 4.5 `ParallaxImage.tsx` — Gambar Paralaks GSAP
+
+**Lokasi:** `src/components/ui/ParallaxImage.tsx`
+
+**Mekanisme:**
+1. Gambar di-*set* awal `scale: 1.1` dan `yPercent: -speed*50`.
+2. Saat pengguna scroll, GSAP `ScrollTrigger` mengubah `yPercent` secara linear (`scrub: true`) dari titik negatif ke positif, menciptakan efek paralaks.
+3. Kecepatan diambil langsung dari data backend (`item.interactions.parallaxSpeed`).
+4. `overflow: hidden` pada wrapper mencegah tepi gambar keluar.
+
+> **Catatan:** Komponen ini saat ini digunakan oleh `GalleryItem.tsx`, yang statusnya *dormant* (tidak aktif dipakai di homepage, tapi masih tersedia untuk halaman lain).
+
+### 4.6 `HoverAccordion.tsx` — Accordion Interaktif
+
+**Lokasi:** `src/components/ui/HoverAccordion.tsx`
+
+**Dual Behavior:**
+- **Mobile:** Vertikal stack. Tap untuk buka/tutup. Tidak ada `onMouseEnter`.
+- **Desktop:** Horizontal stack (`md:flex-row`). Hover mengaktifkan panel. Panel aktif mendapat `grow-[3]`, panel lainnya `grow-[1]`. Teks miring 90° pada panel non-aktif.
+
+---
+
+## 5. Sistem Data & API
+
+### 5.1 Route Handler: `GET /api/gallery`
+
+**File:** `src/app/api/gallery/route.ts`
+
+| Parameter | Tipe | Default | Deskripsi |
+|---|---|---|---|
+| `page` | query string | `1` | Nomor halaman |
+| `limit` | query string | `10` | Jumlah item per halaman |
+
+**Response:**
+```json
+{
+  "success": true,
+  "galleryItems": [ ... ],
+  "pagination": {
+    "total": 9,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1
+  }
+}
+```
+
+### 5.2 Model Data (`GalleryItem`)
+
+```typescript
+interface GalleryItem {
+  id: string;                    // "item-001"
+  title: string;                 // "Vivid Dimensions"
+  category: string;              // "Architecture"
+  slug: string;                  // "vivid-dimensions"
+  images: {
+    thumbnail: string;           // "/images/adrianna-geo-...jpg"
+    fullResolution: string;      // "/images/adrianna-geo-...jpg"
+    altText: string;
+    dimensions: {
+      width: number;             // 800
+      height: number;            // 1200
+      aspectRatio: string;       // "2/3"
+    };
+    isLCP?: boolean;             // true → priority loading
+  };
+  interactions: {
+    parallaxSpeed: number;       // 0.2
+    accordionDescription: string;
+  };
+  metadata: {
+    author: string;              // "Artelab"
+    createdAt: string;           // ISO 8601
+  };
+}
+```
+
+### 5.3 Aset Visual Aktif
+
+Seluruh 9 foto asli tersimpan di `public/images/`:
+
+| # | File | Kategori | Orientasi |
+|---|---|---|---|
+| 1 | `adrianna-geo-1rBg5YSi00c-unsplash.jpg` | Architecture | Portrait (2:3) |
+| 2 | `birmingham-museums-trust-e0wBK0xJXYQ-unsplash.jpg` | Fine Art | Landscape (3:2) |
+| 3 | `birmingham-museums-trust-sJr8LDyEf7k-unsplash.jpg` | Portrait | Portrait (3:4) |
+| 4 | `birmingham-museums-trust-zWE5pOLWkio-unsplash.jpg` | Fine Art | Landscape (14:9) |
+| 5 | `boston-public-library-YoK5pBcSY8s-unsplash.jpg` | Heritage | Portrait (5:7) |
+| 6 | `europeana-5TK1F5VfdIk-unsplash.jpg` | Heritage | Square (1:1) |
+| 7 | `francesco-bianco-TVsgRyKJDc0-unsplash.jpg` | Landscape | Landscape (16:10) |
+| 8 | `henrik-donnestad-t2Sai-AqIpI-unsplash.jpg` | Nature | Portrait (4:5) |
+| 9 | `zeynep-sumer-lk3F07BN8T8-unsplash.jpg` | Urban | Portrait (3:4) |
+
+---
+
+## 6. Rekayasa Animasi
+
+### 6.1 Inventaris Animasi Aktif
+
+| ID | Nama | Library | Lokasi | Trigger |
+|---|---|---|---|---|
+| A1 | **Flowing Grid** | CSS `@keyframes` | `globals.css` + `ImmersiveHomepage` | Otomatis (infinite loop) |
+| A2 | **Scattered Float** | GSAP `random` yoyo | `ImmersiveHomepage` (Desktop) | `activeIndex` berubah |
+| A3 | **Focal Image Swap** | Framer `AnimatePresence` | `ImmersiveHomepage` (Desktop) | `activeIndex` berubah |
+| A4 | **Menu Stagger** | Framer `staggerChildren` | `Navbar` | Menu toggle |
+| A5 | **Shared Element** | Framer `layoutId` | `ImmersiveHomepage` → `GalleryDetailClient` | Navigasi rute |
+| A6 | **Parallax Scroll** | GSAP `ScrollTrigger` | `ParallaxImage` | User scroll |
+| A7 | **Smooth Scroll** | Lenis | `SmoothScrollWrapper` | Otomatis (global) |
+| A8 | **Soft Hover Scale** | CSS `transition-transform` | `ImmersiveHomepage` (both modes) | Mouse hover |
+
+### 6.2 Aturan Aksesibilitas Animasi
+
+```typescript
+// Hook: src/hooks/use-reduced-motion.ts
+const prefersReducedMotion = useReducedMotion();
+```
+
+Jika `true`:
+- **Lenis** tidak diinisialisasi → scroll kembali ke native.
+- **GSAP floating/parallax** di-skip via `if (prefersReducedMotion) return;`.
+- **Framer Motion** tidak ter-override secara otomatis (harus manual per-komponen jika dibutuhkan).
+
+### 6.3 Aturan Performa
+
+| Aturan | Detail |
+|---|---|
+| GPU-Only Transforms | Semua animasi menggunakan `transform` dan `opacity` saja — tidak ada animasi `width`, `height`, `top`, atau `left` |
+| Pointer Events | Background layers selalu `pointer-events-none z-0` |
+| Mobile GSAP Budget | Mobile mode tidak menjalankan GSAP ambient floating (hemat baterai) |
+| `motion-safe:` prefix | Tailwind `animate-flow-grid` hanya aktif jika pengguna tidak memilih *reduced motion* |
+
+---
+
+## 7. State Management (Zustand)
+
+**File:** `src/lib/store.ts`
+
+```typescript
+interface GalleryState {
+  activeGalleryId: string | null;
+  setActiveGalleryId: (id: string | null) => void;
+  isMenuOpen: boolean;
+  setIsMenuOpen: (isOpen: boolean) => void;
+}
+```
+
+**Penggunaan:**
+- `isMenuOpen` → `Navbar.tsx` (toggle mobile overlay).
+- `activeGalleryId` → Tersedia untuk fitur masa depan (misalnya: highlight kartu tertentu di halaman lain).
+
+> **Catatan Desain:** `activeIndex` pada `ImmersiveHomepage` sengaja **tidak** diangkat ke Zustand karena sifatnya lokal (hanya relevan di homepage) dan perubahan state yang sangat cepat (setiap gerakan mouse) akan menyebabkan re-render berlebihan jika ditempatkan di global store.
+
+---
+
+## 8. Panduan Pengembangan Lanjutan
+
+### 8.1 Menambah Item Galeri Baru
+1. Tambahkan foto ke `public/images/`.
+2. Tambahkan entri baru di array `mockGalleryData` pada `src/lib/data.ts`.
+3. Sistem akan otomatis menampilkannya di homepage (baik mobile feed maupun desktop index).
+
+### 8.2 Migrasi ke CMS Sesungguhnya
+1. Ganti isi `src/app/api/gallery/route.ts` dengan fetch ke CMS (Sanity, Strapi, dll).
+2. `src/lib/api.ts` tidak perlu diubah — ia sudah mengkonsumsi format JSON yang baku.
+
+### 8.3 Menambah Halaman Baru
+1. Buat folder di `src/app/[nama-halaman]/page.tsx`.
+2. Pastikan ditambahkan ke array menu di `Navbar.tsx`.
+3. Layout global (Navbar, SmoothScroll) otomatis ter-wrap via `layout.tsx`.
+
+---
+
+## 9. Perintah Eksekusi
+
+```bash
+# Install dependensi
+npm install
+
+# Jalankan development server
+npm run dev
+
+# Build produksi
+npm run build
+
+# Jalankan server produksi
+npm start
+
+# Linting
+npm run lint
+```
+
+---
+
+**PENGESAHAN:**  
+Dokumen ini merupakan refleksi akurat 1:1 dari kondisi *codebase* per tanggal 2 April 2026. Setiap komponen, state, animasi, dan alur data yang direferensikan telah **diimplementasikan secara penuh** dan tersedia di repositori proyek. Tidak ada item yang berstatus "rencana" atau "TBD".
