@@ -10,6 +10,13 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  --animate-flow-grid: flowGrid 20s linear infinite;
+
+  @keyframes flowGrid {
+    from { background-position: 0 0; }
+    to { background-position: 40px 40px; }
+  }
 }
 
 @media (prefers-color-scheme: dark) {

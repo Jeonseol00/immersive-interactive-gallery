@@ -3,77 +3,164 @@ import { GalleryItem } from '@/types';
 export const mockGalleryData: GalleryItem[] = [
   {
     id: "item-001",
-    title: "Neon Dystopia",
-    category: "Cyberpunk",
-    slug: "neon-dystopia",
+    title: "Vivid Dimensions",
+    category: "Architecture",
+    slug: "vivid-dimensions",
     images: {
-      thumbnail: "/images/neon-dystopia-thumb.webp",
-      fullResolution: "/images/neon-dystopia-full.webp",
-      altText: "Cityscape in neon colors during heavy rain",
-      dimensions: {
-        width: 1920,
-        height: 1080,
-        aspectRatio: "16/9"
-      },
+      thumbnail: "/images/adrianna-geo-1rBg5YSi00c-unsplash.jpg",
+      fullResolution: "/images/adrianna-geo-1rBg5YSi00c-unsplash.jpg",
+      altText: "Architectural structure with dynamic lighting",
+      dimensions: { width: 800, height: 1200, aspectRatio: "2/3" },
       isLCP: true
     },
     interactions: {
       parallaxSpeed: 0.2,
-      accordionDescription: "Sebuah eksplorasi visual tentang kehidupan urban di masa depan yang padat."
+      accordionDescription: "Eksplorasi ruang geometris yang melengkung dan garis simetris yang membias pada sudut penglihatan ganda."
     },
-    metadata: {
-      author: "Fikri",
-      createdAt: "2026-04-02T00:00:00Z"
-    }
+    metadata: { author: "Artelab", createdAt: "2026-04-02T00:00:00Z" }
   },
   {
     id: "item-002",
-    title: "Silent Monolith",
-    category: "Abstract",
-    slug: "silent-monolith",
+    title: "Classical Aura",
+    category: "Fine Art",
+    slug: "classical-aura",
     images: {
-      thumbnail: "/images/silent-monolith-thumb.webp",
-      fullResolution: "/images/silent-monolith-full.webp",
-      altText: "A giant abstract structure in a foggy desert",
-      dimensions: {
-        width: 2560,
-        height: 1440,
-        aspectRatio: "16/9"
-      },
+      thumbnail: "/images/birmingham-museums-trust-e0wBK0xJXYQ-unsplash.jpg",
+      fullResolution: "/images/birmingham-museums-trust-e0wBK0xJXYQ-unsplash.jpg",
+      altText: "Classical museum artifact painting",
+      dimensions: { width: 1200, height: 800, aspectRatio: "3/2" },
       isLCP: false
     },
     interactions: {
       parallaxSpeed: 0.15,
-      accordionDescription: "Monumen misterius yang memicu perenungan atas kesunyian absolut."
+      accordionDescription: "Sisa-sisa kemegahan era klasik dalam satu sapuan lukisan yang sarat akan guratan sejarah tak lekang oleh waktu."
     },
-    metadata: {
-      author: "Fikri",
-      createdAt: "2026-04-01T15:30:00Z"
-    }
+    metadata: { author: "Artelab", createdAt: "2026-04-01T15:30:00Z" }
   },
   {
     id: "item-003",
-    title: "Aetherial Blossom",
-    category: "Nature",
-    slug: "aetherial-blossom",
+    title: "Eternal Gaze",
+    category: "Portrait",
+    slug: "eternal-gaze",
     images: {
-      thumbnail: "/images/aetherial-blossom-thumb.webp",
-      fullResolution: "/images/aetherial-blossom-full.webp",
-      altText: "Bioluminescent flora glowing in the dark",
-      dimensions: {
-        width: 1440,
-        height: 1920,
-        aspectRatio: "3/4"
-      },
+      thumbnail: "/images/birmingham-museums-trust-sJr8LDyEf7k-unsplash.jpg",
+      fullResolution: "/images/birmingham-museums-trust-sJr8LDyEf7k-unsplash.jpg",
+      altText: "Historical expressive portrait",
+      dimensions: { width: 900, height: 1200, aspectRatio: "3/4" },
       isLCP: false
     },
     interactions: {
       parallaxSpeed: 0.25,
-      accordionDescription: "Keajaiban botani dengan kilau neon alami yang merespons sentuhan."
+      accordionDescription: "Sebuah tatapan masa lalu yang menembus lapisan kanvas dan kanon waktu menuju abad digital kita."
     },
-    metadata: {
-      author: "Fikri",
-      createdAt: "2026-03-25T10:15:00Z"
-    }
+    metadata: { author: "Artelab", createdAt: "2026-03-25T10:15:00Z" }
+  },
+  {
+    id: "item-004",
+    title: "Mythic Lore",
+    category: "Fine Art",
+    slug: "mythic-lore",
+    images: {
+      thumbnail: "/images/birmingham-museums-trust-zWE5pOLWkio-unsplash.jpg",
+      fullResolution: "/images/birmingham-museums-trust-zWE5pOLWkio-unsplash.jpg",
+      altText: "Large canvas depicting a mythological event",
+      dimensions: { width: 1400, height: 900, aspectRatio: "14/9" },
+      isLCP: false
+    },
+    interactions: {
+      parallaxSpeed: 0.12,
+      accordionDescription: "Kisah mitologi dan fragmen legenda tertuang padat dalam spektrum sinambung yang dramatis."
+    },
+    metadata: { author: "Artelab", createdAt: "2026-03-15T09:00:00Z" }
+  },
+  {
+    id: "item-005",
+    title: "Knowledge Vault",
+    category: "Heritage",
+    slug: "knowledge-vault",
+    images: {
+      thumbnail: "/images/boston-public-library-YoK5pBcSY8s-unsplash.jpg",
+      fullResolution: "/images/boston-public-library-YoK5pBcSY8s-unsplash.jpg",
+      altText: "Vintage historical archive from the library",
+      dimensions: { width: 1000, height: 1400, aspectRatio: "5/7" },
+      isLCP: false
+    },
+    interactions: {
+      parallaxSpeed: 0.22,
+      accordionDescription: "Rak-rak ingatan literatur dunia berpadu dengan jejak manuskrip antik; sebuah arsip kebijaksanaan universal."
+    },
+    metadata: { author: "Artelab", createdAt: "2026-03-10T12:00:00Z" }
+  },
+  {
+    id: "item-006",
+    title: "European Charm",
+    category: "Heritage",
+    slug: "european-charm",
+    images: {
+      thumbnail: "/images/europeana-5TK1F5VfdIk-unsplash.jpg",
+      fullResolution: "/images/europeana-5TK1F5VfdIk-unsplash.jpg",
+      altText: "An old European photograph or artifact",
+      dimensions: { width: 1200, height: 1200, aspectRatio: "1/1" },
+      isLCP: false
+    },
+    interactions: {
+      parallaxSpeed: 0.1,
+      accordionDescription: "Nostalgia peradaban terekam dalam bayangan monokromatis dan distorsi fotografi dari benua biru."
+    },
+    metadata: { author: "Artelab", createdAt: "2026-03-05T14:45:00Z" }
+  },
+  {
+    id: "item-007",
+    title: "Serene Passage",
+    category: "Landscape",
+    slug: "serene-passage",
+    images: {
+      thumbnail: "/images/francesco-bianco-TVsgRyKJDc0-unsplash.jpg",
+      fullResolution: "/images/francesco-bianco-TVsgRyKJDc0-unsplash.jpg",
+      altText: "A breathtaking landscape view",
+      dimensions: { width: 1600, height: 1000, aspectRatio: "16/10" },
+      isLCP: false
+    },
+    interactions: {
+      parallaxSpeed: 0.3,
+      accordionDescription: "Kedalaman panorama alam, menangkap interaksi bisu antara cahaya melankolis dan keheningan bumi."
+    },
+    metadata: { author: "Artelab", createdAt: "2026-02-28T08:30:00Z" }
+  },
+  {
+    id: "item-008",
+    title: "Winter Mirage",
+    category: "Nature",
+    slug: "winter-mirage",
+    images: {
+      thumbnail: "/images/henrik-donnestad-t2Sai-AqIpI-unsplash.jpg",
+      fullResolution: "/images/henrik-donnestad-t2Sai-AqIpI-unsplash.jpg",
+      altText: "Cold winter wilderness atmosphere",
+      dimensions: { width: 800, height: 1000, aspectRatio: "4/5" },
+      isLCP: false
+    },
+    interactions: {
+      parallaxSpeed: 0.18,
+      accordionDescription: "Angin dingin menyapu lapisan es, menceritakan rahasia alam di bawah langit perak."
+    },
+    metadata: { author: "Artelab", createdAt: "2026-02-20T16:20:00Z" }
+  },
+  {
+    id: "item-009",
+    title: "City Echoes",
+    category: "Urban",
+    slug: "city-echoes",
+    images: {
+      thumbnail: "/images/zeynep-sumer-lk3F07BN8T8-unsplash.jpg",
+      fullResolution: "/images/zeynep-sumer-lk3F07BN8T8-unsplash.jpg",
+      altText: "Minimalist urban setting or detail",
+      dimensions: { width: 1200, height: 1600, aspectRatio: "3/4" },
+      isLCP: false
+    },
+    interactions: {
+      parallaxSpeed: 0.28,
+      accordionDescription: "Gema dari kehidupan kota yang terekam dalam ritme cahaya senja, merefleksikan isolasi di antara keramaian."
+    },
+    metadata: { author: "Artelab", createdAt: "2026-02-15T18:00:00Z" }
   }
 ];
