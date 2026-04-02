@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { GalleryItem as GalleryItemType } from "@/types";
@@ -10,6 +10,89 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+
+const MotionLink = motion.create(Link);
+
+const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "reel" | "done", items: GalleryItemType[] }) => (
+  <motion.div
+    key="intro-overlay-stable"
+    initial={false}
+    animate={{ 
+       y: introState === "done" ? "-100%" : "0%", 
+    }}
+    transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
+    className={cn(
+       "fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center overflow-hidden",
+       introState === "done" ? "pointer-events-none" : "pointer-events-auto",
+       introState === "blank" ? "opacity-0" : "opacity-100"
+    )}
+  >
+     <AnimatePresence>
+       {introState === "text" && (
+         <motion.div
+           key="intro-text"
+           initial="hidden"
+           animate="visible"
+           exit={{ opacity: 0, scale: 1.1, filter: "blur(15px)", transition: { duration: 0.4 } }}
+           variants={{
+             hidden: { opacity: 0 },
+             visible: { opacity: 1, transition: { staggerChildren: 0.6, delayChildren: 0.2 } }
+           }}
+           className="absolute inset-0 flex flex-col items-center justify-center gap-3 lg:gap-4 z-20"
+         >
+           <div className="overflow-hidden px-4 py-2">
+              <motion.h2 
+                 variants={{
+                   hidden: { filter: "blur(12px)", opacity: 0, y: 30, scale: 0.95 },
+                   visible: { filter: "blur(0px)", opacity: 1, y: 0, scale: 1 }
+                 }}
+                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                 className="text-3xl md:text-5xl font-mono tracking-widest uppercase text-neutral-400"
+              >
+                 Setiap Karya
+              </motion.h2>
+           </div>
+           
+           <div className="overflow-hidden px-4 py-2">
+              <motion.h2 
+                 variants={{
+                   hidden: { filter: "blur(15px)", opacity: 0, y: 40, scale: 0.9 },
+                   visible: { filter: "blur(0px)", opacity: 1, y: 0, scale: 1 }
+                 }}
+                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                 className="text-5xl md:text-7xl font-black text-amber-500 tracking-tighter"
+              >
+                 Punya Cerita.
+              </motion.h2>
+           </div>
+         </motion.div>
+       )}
+     </AnimatePresence>
+
+     <AnimatePresence>
+       {introState === "reel" && (
+          <motion.div
+             key="intro-reel"
+             initial={{ y: "100vh", opacity: 0 }}
+             animate={{ y: "-150vh", opacity: 0.6 }}
+             exit={{ opacity: 0, transition: { duration: 0.3 } }}
+             transition={{ duration: 1.2, ease: "linear" }}
+             className="absolute flex gap-4 md:gap-8 opacity-40 z-10 w-full justify-center rotate-[-5deg] scale-110 pointer-events-none"
+          >
+             <div className="flex flex-col gap-4 -translate-y-24">
+                {items.slice(0, 4).map((item, i) => <img key={i} src={item.images.thumbnail} className="w-32 h-48 md:w-56 md:h-80 object-cover rounded-xl shadow-2xl brightness-75 sepia-[.2]" alt="" />)}
+             </div>
+             <div className="flex flex-col gap-4 translate-y-12">
+                {items.slice(1, 5).reverse().map((item, i) => <img key={i} src={item.images.thumbnail} className="w-32 h-48 md:w-56 md:h-80 object-cover rounded-xl shadow-2xl brightness-75 sepia-[.2]" alt="" />)}
+             </div>
+             <div className="flex flex-col gap-4 -translate-y-40 hidden md:flex">
+                {items.slice(2, 6).map((item, i) => <img key={i} src={item.images.thumbnail} className="w-32 h-48 md:w-56 md:h-80 object-cover rounded-xl shadow-2xl brightness-75 sepia-[.2]" alt="" />)}
+             </div>
+          </motion.div>
+       )}
+     </AnimatePresence>
+  </motion.div>
+);
 
 interface ImmersiveHomepageProps {
   items: GalleryItemType[];
@@ -21,6 +104,44 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
   const prefersReducedMotion = useReducedMotion();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(true);
+  const [introState, setIntroState] = useState<"blank" | "text" | "reel" | "done">("blank");
+
+  useEffect(() => {
+    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
+    if (hasSeenIntro) {
+      setIntroState("done");
+    } else {
+      setIntroState("text");
+      sessionStorage.setItem('hasSeenIntro', 'true');
+      
+      const reelTimer = setTimeout(() => {
+        setIntroState("reel");
+      }, 2300); // Tunggu teks selesai memudar
+
+      const doneTimer = setTimeout(() => {
+        setIntroState("done");
+      }, 3500); // Waktu rapid reel kilat berlari (1.2 detik) sebelum curtain terbuka
+
+      return () => {
+        clearTimeout(reelTimer);
+        clearTimeout(doneTimer);
+      };
+    }
+  }, []);
+
+  // Upgrade: Generate unique categories for mobile pill navigation
+  const categories = useMemo(() => {
+    const cats = items.map((i) => i.category);
+    return Array.from(new Set(cats));
+  }, [items]);
+
+  // Upgrade: Scroll Progress for Mobile
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
 
   // Measure window size solely on the client to avoid hydration mismatch, but default to mobile
   useEffect(() => {
@@ -74,7 +195,9 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
   // Mobile Render Mode
   if (isMobile) {
     return (
-      <section className="w-full flex flex-col pt-24 pb-20 items-center justify-start bg-black min-h-screen">
+      <main className="w-full flex flex-col items-center justify-start bg-black min-h-screen relative">
+        <IntroOverlay introState={introState} items={items} />
+        
         {/* Mobile Animated Grid Background */}
         <div 
           className="fixed inset-0 pointer-events-none opacity-20 motion-safe:animate-flow-grid z-0"
@@ -88,12 +211,116 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
           }}
         />
 
-        <div className="container mx-auto px-6 w-full max-w-2xl flex flex-col gap-24 relative z-10">
+        {/* Upgrade 3: Scroll Progress Indicator */}
+        <motion.div
+          className="fixed top-16 md:top-20 left-0 right-0 h-[3px] bg-amber-500 origin-left z-50 shadow-[0_0_12px_rgba(245,158,11,0.6)]"
+          style={{ scaleX }}
+        />
+
+        {/* Upgrade 6: Cinematic Hero Section (Lobi Galeri) */}
+        <section className="relative w-full h-[100dvh] flex flex-col items-center justify-center overflow-hidden z-10">
+          <div className="absolute inset-0 w-full h-full pointer-events-none">
+             {/* THE DROP REVEALER: Focus pull dari atas ke bawah */}
+             <motion.div
+                initial={false}
+                animate={introState === "done" ? { y: "0%", scale: 1, filter: "blur(0px)" } : { y: "-15%", scale: 1.1, filter: "blur(15px)" }}
+                transition={{ duration: 1.5, ease: [0.76, 0, 0.24, 1] }} // Tersinkron dengan Curtain rise
+                className="w-full h-full absolute inset-0"
+             >
+                 {/* THE ENDLESS BREATH: Ken burns berjalan paralel di dalamnya */}
+                 <motion.div 
+                   initial={{ scale: 1 }}
+                   animate={{ scale: 1.05 }}
+                   transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
+                   className="w-full h-full relative origin-center"
+                 >
+                    <Image 
+                      src={items[0].images.fullResolution} 
+                      alt="IMGAL Hero"
+                      fill
+                      className="object-cover"
+                      priority
+                      sizes="100vw"
+                    />
+                 </motion.div>
+             </motion.div>
+             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-neutral-950/40 mix-blend-multiply" />
+             <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black" />
+          </div>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="relative z-20 flex flex-col items-center text-center px-6 mt-16"
+          >
+            <h1 className="text-7xl font-black tracking-tighter text-white/90 drop-shadow-2xl">IMGAL</h1>
+            <p className="text-amber-500 font-bold uppercase tracking-[0.3em] text-[10px] mt-3">Ruang Digital Mahakarya Abadi</p>
+          </motion.div>
+
+          <motion.div 
+            initial={false}
+            animate={introState === "done" ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+            transition={{ duration: 1.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute bottom-16 z-20 flex flex-col items-center gap-3"
+          >
+            <span className="text-[9px] font-black text-neutral-500 uppercase tracking-widest">Jelajahi Galeri</span>
+            <motion.div 
+               initial={{ y: 0 }}
+               animate={{ y: 8 }}
+               transition={{ duration: 0.75, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+               className="w-4 h-7 border-2 border-white/20 rounded-full flex justify-center p-0.5 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+            >
+               <div className="w-1 h-1.5 bg-amber-500 rounded-full" />
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* Zona 2: Feed "Ruang Pameran" */}
+        <div className="w-full relative z-20 bg-black">
+          {/* Upgrade 2: Category Pills Navigation */}
+          <div className="w-full overflow-x-auto no-scrollbar py-4 px-6 mb-6 sticky top-16 md:top-20 z-40 bg-black/80 backdrop-blur-xl border-b border-t border-white/10">
+            <div className="flex gap-3">
+              <button 
+                onClick={() => window.scrollTo({ top: window.innerHeight - 80, behavior: 'smooth' })}
+                className="px-5 py-2.5 rounded-full border border-white/20 bg-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
+              >
+                All Works
+              </button>
+              {categories.map((cat, idx) => (
+                <button 
+                  key={idx}
+                  onClick={() => {
+                    const el = document.getElementById(`feed-category-${cat.toLowerCase().replace(/\s+/g, '-')}`);
+                    if (el) {
+                      const y = el.getBoundingClientRect().top + window.scrollY - 150;
+                      window.scrollTo({ top: y, behavior: 'smooth' });
+                    }
+                  }}
+                  className="px-5 py-2.5 rounded-full border border-white/20 bg-white/5 text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 hover:text-white hover:border-amber-500 hover:bg-amber-500/10 active:scale-95 transition-all whitespace-nowrap"
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="container mx-auto px-6 pb-20 w-full max-w-2xl flex flex-col gap-16 sm:gap-20 relative z-10">
           {items.map((item, idx) => (
-            <div key={`mobile-feed-${item.id}`} className="flex flex-col gap-6 w-full">
-              <Link 
+            <motion.div 
+              key={`mobile-feed-${item.id}`} 
+              id={`feed-category-${item.category.toLowerCase().replace(/\s+/g, '-')}`}
+              className="flex flex-col gap-5 sm:gap-6 w-full"
+              initial={{ opacity: 0, y: 50, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {/* Upgrade 4: Micro-interaction whileTap */}
+              <MotionLink 
                 href={`/gallery/${item.slug}`} 
-                className="w-full relative aspect-[3/4] rounded-[2rem] overflow-hidden shadow-2xl block group pointer-events-auto cursor-pointer border border-white/10"
+                whileTap={{ scale: 0.96 }}
+                className="w-full relative aspect-[4/5] sm:aspect-[3/4] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl block group pointer-events-auto cursor-pointer border border-white/10"
               >
                 <motion.div layoutId={`gallery-image-${item.id}`} className="w-full h-full relative">
                   <Image
@@ -109,22 +336,27 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
                 </motion.div>
                 
                 {/* Touch Overlay Indicator */}
-                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase opacity-80 pointer-events-none">
-                  Tap to View
+                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase opacity-90 pointer-events-none ring-1 ring-white/20">
+                  TAP TO VIEW
                 </div>
-              </Link>
+              </MotionLink>
               
-              <div className="flex flex-col gap-2 px-2 pointer-events-none">
-                <p className="text-amber-500 font-bold uppercase tracking-widest text-xs">{item.category}</p>
-                <h2 className="text-3xl font-black tracking-tight leading-none text-white">{item.title}</h2>
-                <p className="text-neutral-400 text-sm mt-2 leading-relaxed">
+              {/* Upgrade 5: Typography & Spacing */}
+              <div className="flex flex-col gap-1 sm:gap-2 px-1 pointer-events-none">
+                <div className="flex items-center justify-between">
+                  <p className="text-amber-500 font-bold uppercase tracking-widest text-[10px] sm:text-xs">{item.category}</p>
+                  <span className="text-neutral-600 text-[10px] font-mono font-bold">{idx + 1} / {items.length}</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black tracking-tight leading-none text-white mt-1">{item.title}</h2>
+                <p className="text-neutral-400 text-sm mt-1 leading-relaxed line-clamp-2">
                   {item.interactions.accordionDescription}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+        </div>
+      </main>
     );
   }
 
@@ -134,6 +366,8 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
       ref={containerRef}
       className="relative min-h-screen flex flex-col pt-24 pb-20 w-full overflow-hidden bg-black"
     >
+      <IntroOverlay introState={introState} items={items} />
+
       {/* Desktop Animated Grid Background */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-20 motion-safe:animate-flow-grid z-0"

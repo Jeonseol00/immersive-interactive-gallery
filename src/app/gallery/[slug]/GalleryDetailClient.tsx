@@ -32,27 +32,28 @@ export function GalleryDetailClient({ item }: { item: GalleryItem }) {
         <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-neutral-950 to-transparent pointer-events-none" />
       </div>
 
-      <div className="container mx-auto px-6 md:px-12 -mt-16 md:-mt-32 relative z-10">
+      <div className="container mx-auto px-6 md:px-12 -mt-24 md:-mt-32 relative z-10">
         <div className="flex flex-col gap-6 md:gap-12 max-w-4xl mx-auto">
-          <header className="flex flex-col gap-4">
+          {/* Upgrade: Floating Metadata Card untuk Mobile */}
+          <header className="flex flex-col gap-3 md:gap-4 bg-black/70 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none p-6 md:p-0 rounded-[1.5rem] md:rounded-none border border-white/10 md:border-none shadow-2xl md:shadow-none">
             <motion.span 
-              className="text-amber-500 font-bold tracking-widest uppercase text-sm"
+              className="text-amber-500 font-bold tracking-widest uppercase text-xs md:text-sm"
               layoutId={`gallery-category-${item.id}`}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
               {item.category}
             </motion.span>
             <motion.h1 
-              className="text-4xl md:text-6xl font-black tracking-tight"
+              className="text-3xl md:text-6xl font-black tracking-tight"
               layoutId={`gallery-title-${item.id}`}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
               {item.title}
             </motion.h1>
             
-            <div className="flex gap-4 text-neutral-400 text-sm mt-4 border-b border-white/10 pb-8">
+            <div className="flex flex-wrap gap-x-4 gap-y-2 text-neutral-400 text-[10px] md:text-sm mt-2 md:mt-4 border-b border-white/5 md:border-white/10 pb-4 md:pb-8">
               <span>By {item.metadata.author}</span>
-              <span>•</span>
+              <span className="hidden md:inline">•</span>
               <span>{new Date(item.metadata.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric'})}</span>
             </div>
           </header>

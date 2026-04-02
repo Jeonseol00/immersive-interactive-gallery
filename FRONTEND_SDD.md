@@ -1,9 +1,9 @@
-# SOFTWARE DESIGN DOCUMENT (SDD) — REVISI 2.0
+# SOFTWARE DESIGN DOCUMENT (SDD) — REVISI 3.0
 **Proyek:** Immersive Interactive Gallery  
 **Nama Kode:** ARTELAB VOL. 3 — MIRAGE  
-**Fase:** Eksekusi Tahap 2 (Frontend & UI/UX Integration) — *Post-Refactor*  
-**Tanggal:** 2 April 2026  
-**Status:** ✅ FINAL — *Arsitektur Stabil, Siap Produksi*
+**Fase:** Eksekusi Tahap 3 (First Impression Architecture & Ecosystem)  
+**Tanggal:** 3 April 2026  
+**Status:** ✅ FINAL — *Ecosystem Lengkap, Animasi Sinematik Terpasang, Siap Produksi*
 
 ---
 
@@ -11,16 +11,14 @@
 
 Dokumen ini adalah **Software Design Document (SDD)** revisi terkini yang mencerminkan kondisi *codebase* aktual setelah dua kali iterasi mayor. Semua artefak teknis yang direferensikan di sini telah **diimplementasikan dan diverifikasi** — bukan rencana, melainkan dokumentasi dari sistem yang sudah berjalan.
 
-### 1.1 Perubahan Kunci dari SDD v1.0
+### 1.1 Perubahan Kunci dari SDD v2.0 ke v3.0
 
-| Aspek | SDD v1.0 | SDD v2.0 (Ini) |
-|---|---|---|
-| Homepage Architecture | `HeroSection` + `GalleryGrid` (terpisah) | `ImmersiveHomepage` monolitik tunggal |
-| Mobile Strategy | Accordion tersembunyi + thumbnail kecil | **Curated Vertical Feed** layar penuh |
-| Desktop Strategy | Grid statis 3 kolom | **Interactive Hover-Swap Index + Scattered Gallery** |
-| Image Assets | URL placeholder dummy | 9 foto beresolusi tinggi (`public/images/`) |
-| Background Grid | SVG statis | CSS Linear Gradient + Keyframe `flowGrid` animasi |
-| Menu Mobile | `translate-x` toggle | Framer Motion `AnimatePresence` + `staggerChildren` |
+| Aspek | Evolusi SDD v3.0 |
+|---|---|
+| **First Impression** | Memperkenalkan `IntroOverlay` dengan efek *Cinematic Focus Pull* & *Rapid Reel Montage*. |
+| **Homepage Architecture** | *Single-Page Flow* — Integrasi Hero Landing Section Lobi Raksasa (`100dvh`) di atas Feed. |
+| **Menu Mobile** | Re-desain menjadi *Full-Screen Immersive Overlay* dengan transisi teatrikal + Social Footer. |
+| **Ecosystem Pages** | Inklusi halaman ekosistem korporat: `/about` (Pillar grid), `/contact` (Form kaca), `/campaigns` (Vertical timeline). |
 
 ---
 
@@ -60,6 +58,9 @@ src/
 │   ├── layout.tsx              # Root Layout (SmoothScrollWrapper + Navbar)
 │   ├── page.tsx                # Homepage entry → <ImmersiveHomepage />
 │   ├── globals.css             # Design tokens, flowGrid keyframe
+│   ├── about/page.tsx          # Halaman Ekosistem: Tentang Kami
+│   ├── campaigns/page.tsx      # Halaman Ekosistem: Timeline Kampanye
+│   ├── contact/page.tsx        # Halaman Ekosistem: Hubungi Kami
 │   ├── api/
 │   │   └── gallery/
 │   │       └── route.ts        # GET /api/gallery — paginated mock data
@@ -69,11 +70,10 @@ src/
 │           └── GalleryDetailClient.tsx  # Detail page Client Component
 ├── components/
 │   ├── layout/
-│   │   ├── Navbar.tsx          # Fixed header + Staggered mobile overlay
+│   │   ├── Navbar.tsx          # Full-screen Immersive Overlay Navigation
 │   │   └── SmoothScrollWrapper.tsx  # Lenis + GSAP ScrollTrigger bridge
 │   ├── sections/
-│   │   ├── ImmersiveHomepage.tsx     # ⭐ KOMPONEN UTAMA — Split-Render Engine
-│   │   └── HeroSection.tsx          # [DEPRECATED] Tidak lagi dipakai di page.tsx
+│   │   ├── ImmersiveHomepage.tsx    # ⭐ KOMPONEN UTAMA (Hero Lobi + Feed + IntroOverlay)
 │   └── ui/
 │       ├── GalleryItem.tsx          # [DORMANT] Card individual (tidak dipakai di homepage baru)
 │       ├── ParallaxImage.tsx        # Gambar + GSAP ScrollTrigger parallax
@@ -128,6 +128,13 @@ graph TD
 | `activeIndex` | `number` | `0` | Indeks item galeri yang sedang aktif/dipilih |
 | `isMobile` | `boolean` | `true` | Deteksi breakpoint (< 768px). Default `true` untuk mencegah *flash of desktop content* di SSR |
 
+#### Mode Render: Global / First Impression (Semua Ukuran Layar)
+
+Sebuah `IntroOverlay` mengintersep tampilan awal sebelum pengguna diizinkan melihat galeri:
+1. **Fase Text (0-2.3d):** Menyajikan frasa tipografi *"Setiap Karya Punya Cerita"* yang memudar masuk menggunakan efek optikal *blur* dramatis.
+2. **Fase Reel (2.3-3.5d):** Teks hilang, digantikan oleh *Rapid Reel* 3 kolom berisi cuplikan mahakarya yang bergulir kilat dari bawah ke atas (`y: -150vh`) dengan kemiringan `-5deg` dan *tone sepia* untuk ilusi kecepatan pita film.
+3. **Fase Curtain Rise:** Papan hitam utuh memisahkan dan terangkat (`y: -100%`) membedah keanggunan sejati *Hero Section*. Intro ini diingat melalui persetujuan sesi peramban (`sessionStorage`) sehingga tidak direpetisi jika pengguna berpindah ruang.
+
 #### Mode Render: Mobile (< 768px)
 
 ```
@@ -135,30 +142,25 @@ graph TD
 │         NAVBAR              │
 ├─────────────────────────────┤
 │  ┌───────────────────────┐  │
+│  │     HERO LOBI (100dvh)│  │ ← Cinematic Ken Burns & Scroll Pillar
+│  └───────────────────────┘  │
+│  ┌───────────────────────┐  │
 │  │                       │  │
-│  │     FOTO BESAR        │  │ ← aspect-[3/4], rounded-[2rem]
+│  │     FOTO BESAR #1     │  │ ← aspect-[3/4], rounded-[2rem]
 │  │     (Tap to View)     │  │ ← layoutId="gallery-image-{id}"
 │  │                       │  │
 │  └───────────────────────┘  │
 │  Category • JUDUL TEBAL     │
 │  Deskripsi singkat...       │
-│                             │
-│  ┌───────────────────────┐  │
-│  │                       │  │
-│  │     FOTO BESAR #2     │  │
-│  │                       │  │ ← gap-24 antar item
-│  └───────────────────────┘  │
-│  Category • JUDUL TEBAL     │
-│  ...dst (9 item total)      │
 └─────────────────────────────┘
 ```
 
 **Perilaku:**
-- Setiap foto membentang penuh layar (`w-full aspect-[3/4]`).
-- Lencana `"Tap to View"` muncul di pojok kanan atas setiap foto.
+- Dimulai dengan **Hero Lobi Single-Page** `100dvh` diisi animasi perlahan gambar pertama tanpa henti dan pemicu jari di ranah bawah.
+- Di bawah Hero, tersedia **Pills Kategori Horisontal** untuk jangkar navigasi instan.
+- Setiap foto direkayasa sentuh; dengan sentuhan (Tap/WhileTap), skala menyusut `0.96` berisikan Lencana `"Tap to View"` melayang.
 - TAP foto → navigasi ke `/gallery/[slug]` via `<Link>` dengan Shared Element Transition (`layoutId`).
-- Grid animasi *flowing lines* terpasang sebagai `fixed` background di belakang seluruh feed.
-- **TIDAK ADA** interaksi `onMouseEnter` di mode ini (kepatuhan SDD v1 Pasal 1 — *Zero Hover di Perangkat Sentuh*).
+- Kepatuhan SDD: *Zero Hover di Perangkat Sentuh*. Penuh interaksi kinetik (Lenis scroll sinkron).
 
 #### Mode Render: Desktop (≥ 768px)
 
@@ -195,13 +197,13 @@ graph TD
 
 | Fitur | Desktop | Mobile |
 |---|---|---|
-| Posisi | `fixed top-0`, `backdrop-blur-md bg-black/40` | Sama |
-| Menu | Horizontal links inline + tombol CTA | Hamburger icon (`Menu`/`X`) |
-| Overlay | — | `AnimatePresence` + `motion.div` fullscreen |
-| Animasi Menu | — | `staggerChildren: 0.1`, `delayChildren: 0.2`, slide-up per item |
-| Item Menu | Galeri, Tentang Kami, Hubungi (CTA putih) | Galeri, Kampanye, Tentang Kami, Hubungi |
+| Posisi | `fixed top-0` dengan mix-blend estetis eksklusif |
+| Menu | Navigasi meluas *overlay* `100dvh` (Tampilan penuh di kedua perangkat) |
+| Animasi Overlay | *Curtain Draw* terselubung via Framer `AnimatePresence`. Mengaburkan dan menutup layar di belakang. |
+| Animasi Menu | *Stagger Reveal* beruntun `y: 50 -> 0`. Link menari bergoyang saat dilewati *mouse*. |
+| Elevasi Arsitektur | Dilengkapi komponen teratur *Dividers* pembelah halaman dan _Social Contact Footer_ dinamis di dasarnya. |
 
-**State:** Menggunakan Zustand store (`useStore`) untuk `isMenuOpen` / `setIsMenuOpen`.
+**State:** Menggunakan Zustand store (`useStore`) untuk mentransfer status navigasi (`isMenuOpen`) demi menjaga *scroll blocking* dokumen tubuh (`document.body.style.overflow`).
 
 ### 4.3 `GalleryDetailClient.tsx` — Halaman Detail Proyek
 
