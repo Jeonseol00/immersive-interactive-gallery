@@ -73,21 +73,56 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
        {introState === "reel" && (
           <motion.div
              key="intro-reel"
-             initial={{ y: "100vh", opacity: 0 }}
-             animate={{ y: "-150vh", opacity: 0.6 }}
-             exit={{ opacity: 0, transition: { duration: 0.3 } }}
-             transition={{ duration: 1.2, ease: "linear" }}
-             className="absolute flex gap-4 md:gap-8 opacity-40 z-10 w-full justify-center rotate-[-5deg] scale-110 pointer-events-none"
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 0.8 }}
+             exit={{ opacity: 0, transition: { duration: 0.5 } }} // Mengaburkan (fade out) perlahan saat tirai hero terangkat
+             className="absolute flex gap-4 md:gap-8 z-10 w-full h-[150vh] justify-center rotate-[-5deg] scale-110 pointer-events-none"
           >
-             <div className="flex flex-col gap-4 -translate-y-24">
-                {items.slice(0, 4).map((item, i) => <img key={i} src={item.images.thumbnail} className="w-32 h-48 md:w-56 md:h-80 object-cover rounded-xl shadow-2xl brightness-75 sepia-[.2]" alt="" />)}
-             </div>
-             <div className="flex flex-col gap-4 translate-y-12">
-                {items.slice(1, 5).reverse().map((item, i) => <img key={i} src={item.images.thumbnail} className="w-32 h-48 md:w-56 md:h-80 object-cover rounded-xl shadow-2xl brightness-75 sepia-[.2]" alt="" />)}
-             </div>
-             <div className="flex flex-col gap-4 -translate-y-40 hidden md:flex">
-                {items.slice(2, 6).map((item, i) => <img key={i} src={item.images.thumbnail} className="w-32 h-48 md:w-56 md:h-80 object-cover rounded-xl shadow-2xl brightness-75 sepia-[.2]" alt="" />)}
-             </div>
+             {/* Pilar 1 - Laju Konstan */}
+             <motion.div 
+               initial={{ y: "100vh" }} 
+               animate={{ y: "-130vh" }} 
+               transition={{ duration: 2.2, ease: "circIn" }}
+               className="flex flex-col gap-4 -translate-y-12"
+             >
+                {[...items.slice(0, 5), ...items.slice(0, 2)].map((item, i) => (
+                  <div key={`c1-${i}`} className="relative w-32 h-48 md:w-56 md:h-80 rounded-[1.5rem] shadow-2xl brightness-75 sepia-[.2] overflow-hidden border border-white/10 shrink-0">
+                    <Image src={item.images.thumbnail} alt="" fill sizes="25vw" className="object-cover" priority quality={35} />
+                  </div>
+                ))}
+             </motion.div>
+
+             {/* Pilar 2 - Laju Tertinggi & Kedalaman Visual (Parallax Jauh) */}
+             <motion.div 
+               initial={{ y: "120vh" }} 
+               animate={{ y: "-180vh" }} 
+               transition={{ duration: 2.1, ease: "circIn" }}
+               className="flex flex-col gap-4 translate-y-32 z-[-1]"
+             >
+                {[...items.slice(3, 8).reverse(), ...items.slice(3, 5)].map((item, i) => (
+                  <div key={`c2-${i}`} className="relative w-32 h-48 md:w-56 md:h-80 rounded-[1.5rem] shadow-2xl brightness-50 sepia-[.4] overflow-hidden border border-white/10 shrink-0">
+                    <Image src={item.images.thumbnail} alt="" fill sizes="25vw" className="object-cover" priority quality={35} />
+                  </div>
+                ))}
+             </motion.div>
+
+             {/* Pilar 3 - Sedang (Dekstop Saja) */}
+             <motion.div 
+               initial={{ y: "80vh" }} 
+               animate={{ y: "-150vh" }} 
+               transition={{ duration: 2.3, ease: "circIn" }}
+               className="flex flex-col gap-4 -translate-y-32 hidden md:flex"
+             >
+                {[...items.slice(6, 9), ...items.slice(0, 4)].map((item, i) => (
+                  <div key={`c3-${i}`} className="relative w-32 h-48 md:w-56 md:h-80 rounded-[1.5rem] shadow-2xl brightness-75 sepia-[.2] overflow-hidden border border-white/10 shrink-0">
+                    <Image src={item.images.thumbnail} alt="" fill sizes="25vw" className="object-cover" priority quality={35} />
+                  </div>
+                ))}
+             </motion.div>
+             
+             {/* Masking Gradient agar gambar tidak merobek tepi layar seketika */}
+             <div className="absolute inset-x-0 top-0 h-[25vh] bg-gradient-to-b from-black to-transparent z-20 pointer-events-none" />
+             <div className="absolute inset-x-0 bottom-0 h-[25vh] bg-gradient-to-t from-black to-transparent z-20 pointer-events-none" />
           </motion.div>
        )}
      </AnimatePresence>
@@ -120,7 +155,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
 
       const doneTimer = setTimeout(() => {
         setIntroState("done");
-      }, 3500); // Waktu rapid reel kilat berlari (1.2 detik) sebelum curtain terbuka
+      }, 4600); // 2.3 detik durasi reel ditenangkan (2.3s text + 2.3s reel = 4.6s)
 
       return () => {
         clearTimeout(reelTimer);
