@@ -47,14 +47,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Prepare scattered items for Hero background (Desktop Only) — statis & tersebar penuh layar
-  const heroScatteredItems = useMemo(() => {
-    const result = [];
-    for (let i = 0; i < 8; i++) {
-      result.push(items[i % items.length]);
-    }
-    return result;
-  }, [items]);
+
 
   // Prepare scattered items for Zone 2 Card Shuffle (Desktop Only) — dinamis berdasarkan activeIndex
   const zone2ScatteredItems = useMemo(() => {
@@ -67,37 +60,10 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     if (prefersReducedMotion || typeof window === "undefined" || isMobile) return;
 
     gsap.registerPlugin(ScrollTrigger);
-    
-    // Animate scattered ambient images on Desktop
-    const elements = document.querySelectorAll(".scattered-image");
-    gsap.killTweensOf(elements);
-
-    elements.forEach((el, index) => {
-      gsap.to(el, {
-        y: `random(-20, 20)`,
-        x: `random(-20, 20)`,
-        rotation: `random(-5, 5)`,
-        duration: `random(4, 7)`,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        delay: index * 0.1
-      });
-    });
 
   }, [activeIndex, prefersReducedMotion, isMobile]);
 
-  // Posisi tersebar full-layar Hero (edge-to-edge)
-  const heroScatteredPositions = [
-    "top-[5%] left-[3%] w-[220px] h-[300px]",
-    "top-[8%] left-[28%] w-[180px] h-[250px]",
-    "top-[3%] right-[28%] w-[200px] h-[280px]",
-    "top-[10%] right-[3%] w-[240px] h-[320px]",
-    "bottom-[8%] left-[5%] w-[200px] h-[270px]",
-    "bottom-[5%] left-[30%] w-[170px] h-[240px]",
-    "bottom-[10%] right-[25%] w-[190px] h-[260px]",
-    "bottom-[6%] right-[2%] w-[210px] h-[290px]",
-  ];
+
 
 
 
@@ -139,16 +105,16 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
              >
                  {/* THE ENDLESS BREATH: Ken burns berjalan paralel di dalamnya */}
                  <motion.div 
-                   initial={{ scale: 1 }}
-                   animate={{ scale: 1.05 }}
-                   transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
-                   className="w-full h-full relative origin-center"
+                   initial={{ scale: 1.0 }}
+                   animate={{ scale: 1.1 }}
+                   transition={{ duration: 30, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
+                   className="w-full h-full relative origin-center bg-neutral-950"
                  >
                     <Image 
-                      src={items[0].images.fullResolution} 
-                      alt="IMGAL Hero"
+                      src="/images/topography.png" 
+                      alt="Topography Theme"
                       fill
-                      className="object-cover"
+                      className="object-cover opacity-70 mix-blend-screen"
                       priority
                       sizes="100vw"
                     />
@@ -335,29 +301,26 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
       {/* ZONA 1: Cinematic Hero Desktop */}
       <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 overflow-hidden">
         
-        {/* Hero Scattered Gallery — Edge-to-Edge, Absolute di dalam Hero */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          {heroScatteredItems.map((item, index) => (
-            <motion.div
-              key={`hero-scatter-${index}`}
-              initial={{ opacity: 0, scale: 0.85, y: 30 }}
-              animate={{ opacity: 0.35, scale: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.1 * index, ease: [0.22, 1, 0.36, 1] }}
-              className={cn(
-                "scattered-image absolute overflow-hidden rounded-2xl border border-white/10",
-                heroScatteredPositions[index]
-              )}
-            >
-              <Image
-                src={item.images.thumbnail}
-                alt=""
-                fill
-                className="object-cover grayscale brightness-50 contrast-110"
-                sizes="20vw"
-                quality={40}
-              />
-            </motion.div>
-          ))}
+        {/* Topography Background — Smooth Ken Burns Effect */}
+        <div className="absolute inset-0 z-0 pointer-events-none bg-neutral-950">
+          <motion.div
+            initial={{ scale: 1.0 }}
+            animate={{ scale: 1.15 }}
+            transition={{ duration: 40, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
+            className="w-full h-full relative origin-center"
+          >
+            <Image
+              src="/images/topography.png"
+              alt="Topography Base"
+              fill
+              className="object-cover opacity-70 mix-blend-screen"
+              priority
+              sizes="100vw"
+            />
+          </motion.div>
+          {/* Subtle gradient overlays to keep text 100% legible and add depth */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/80" />
+          <div className="absolute inset-0" style={{ background: "radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.6) 100%)" }} />
         </div>
         
         {/* Hero Typography */}
