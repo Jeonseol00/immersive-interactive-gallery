@@ -238,13 +238,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     "bottom-[6%] right-[2%] w-[210px] h-[290px]",
   ];
 
-  // Posisi melayang untuk Zone 2 (disekitar Focal Image)
-  const zone2ScatteredPositions = [
-    "top-0 -right-[5%] w-[350px] h-[450px] opacity-40",
-    "-bottom-[5%] -left-[5%] w-[300px] h-[400px] opacity-30",
-    "top-[45%] -left-[10%] w-[400px] h-[300px] opacity-50",
-    "top-[15%] -left-[2%] w-[250px] h-[250px] opacity-20",
-  ];
+
 
   const activeItem = items[activeIndex];
 
@@ -575,32 +569,51 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         {/* Right Side: Vast Central Focal Image & Zone 2 Scattered Ambient */}
         <div className="flex-1 flex flex-col justify-center items-center relative h-full pointer-events-none">
           
-          {/* Scattered Ambient Card Shuffle di balik Focal Image */}
-          <div className="absolute inset-0 pointer-events-none z-0">
-            <AnimatePresence mode="popLayout">
-              {zone2ScatteredItems.map((item, index) => (
-                <motion.div
-                  layout
-                  key={`zone2-scatter-${item.id}`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.1, transition: { duration: 0.5 } }}
-                  transition={{ layout: { type: "spring", stiffness: 100, damping: 20 }, opacity: { duration: 0.8 } }}
-                  className={cn(
-                    "scattered-image absolute overflow-hidden rounded-xl border border-white/5 mix-blend-luminosity",
-                    zone2ScatteredPositions[index]
-                  )}
-                >
-                  <Image
-                    src={item.images.thumbnail}
-                    alt=""
-                    fill
-                    className="object-cover grayscale brightness-75 contrast-125"
-                    sizes="33vw"
-                    quality={30}
-                  />
-                </motion.div>
-              ))}
+          {/* Scattered Ambient Card Shuffle (Professional Dealing Cards Effect) */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl aspect-[3/2] pointer-events-none z-0">
+            <AnimatePresence>
+              {zone2ScatteredItems.map((item, index) => {
+                // Konfigurasi posisi untuk masing-masing urutan kartu (3D Parallax Shuffle)
+                const transforms = [
+                  { rotate: 6, x: "25%", y: "-15%", scale: 0.9, opacity: 0.5, zIndex: 4 },
+                  { rotate: -8, x: "-30%", y: "20%", scale: 0.8, opacity: 0.35, zIndex: 3 },
+                  { rotate: -12, x: "-40%", y: "-10%", scale: 0.7, opacity: 0.25, zIndex: 2 },
+                  { rotate: 15, x: "35%", y: "25%", scale: 0.6, opacity: 0.15, zIndex: 1 },
+                ];
+                const prop = transforms[index];
+
+                return (
+                  <motion.div
+                    key={`zone2-scatter-${item.id}`}
+                    initial={{ opacity: 0, scale: 0.3, y: 150 }}
+                    animate={{ 
+                      opacity: prop.opacity, 
+                      scale: prop.scale, 
+                      rotate: prop.rotate, 
+                      x: prop.x, 
+                      y: prop.y,
+                      zIndex: prop.zIndex
+                    }}
+                    exit={{ opacity: 0, scale: 0.4, y: 150, x: "50%", rotate: prop.rotate * 2 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 80, 
+                      damping: 15, 
+                      mass: 1 + index * 0.3 // Menciptakan efek serentak yang organik
+                    }}
+                    className="absolute inset-0 overflow-hidden rounded-[2rem] border border-white/20 mix-blend-luminosity shadow-2xl origin-center"
+                  >
+                    <Image
+                      src={item.images.thumbnail}
+                      alt=""
+                      fill
+                      className="object-cover grayscale brightness-75 contrast-125"
+                      sizes="20vw"
+                      quality={30}
+                    />
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </div>
 
