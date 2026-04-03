@@ -567,7 +567,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 1 }}
-        className="w-full py-24 flex flex-col items-center justify-center relative z-10 bg-gradient-to-t from-neutral-950 via-black/90 to-transparent border-t border-white/5 shrink-0"
+        className="w-full py-24 flex flex-col items-center justify-center relative z-10 bg-transparent shrink-0"
       >
          {/* Decorative Line */}
          <motion.div 
