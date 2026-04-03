@@ -22,7 +22,7 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
     }}
     transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
     className={cn(
-       "fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center overflow-hidden",
+       "fixed inset-0 z-[9000] bg-black flex flex-col items-center justify-center overflow-hidden",
        introState === "done" ? "pointer-events-none" : "pointer-events-auto",
        introState === "blank" ? "opacity-0" : "opacity-100"
     )}
@@ -142,13 +142,15 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
   const [introState, setIntroState] = useState<"blank" | "text" | "reel" | "done">("blank");
 
   useEffect(() => {
-    // Mobile Intro Sequence Logic (Rapid Reel)
-    // Sekarang tersinkronisasi sehingga ia tidak tumpang tindih dengan Global Preloader
+    // Intro Sequence Logic (Teks & Rapid Reel)
+    // Menggunakan Polling yang 100% presisi memastikan intro ini HANYA jalan SETELAH Preloader usai
     let reelTimer: NodeJS.Timeout;
     let doneTimer: NodeJS.Timeout;
-    let fallbackTimer: NodeJS.Timeout;
+    let seqWaitTimer: NodeJS.Timeout;
+    let pollInterval: NodeJS.Timeout;
 
-    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
+    // Reset nama sesi agar pengguna bisa melihat perbaruannya tanpa manual hapus cache
+    const hasSeenIntro = sessionStorage.getItem('hasSeenEpicIntro_v4');
     if (hasSeenIntro) {
       setIntroState("done");
       return;
@@ -156,32 +158,35 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
 
     const startIntroSequence = () => {
       setIntroState("text");
-      sessionStorage.setItem('hasSeenIntro', 'true');
+      sessionStorage.setItem('hasSeenEpicIntro_v4', 'true');
       
+      // Tahap 1: Teks 'Setiap Karya Punya Cerita' dipasang selama 3 Detik
       reelTimer = setTimeout(() => {
         setIntroState("reel");
-      }, 2300); // Tunggu teks mahakarya melebur
+      }, 3000);
 
+      // Tahap 2: Air terjun gambar (Rapid Reel) berjalan selama 2 Detik
       doneTimer = setTimeout(() => {
         setIntroState("done");
-      }, 4600); // Durasi penuh sebelum meledak ke homepage
+      }, 5000); 
     };
 
-    // Apabila Global Preloader sudah pernah dilewati (misal pindah halaman)
-    const isGlobalPreloaderDone = sessionStorage.getItem("preloader_done");
-    if (isGlobalPreloaderDone) {
-      // Jika ya, tunggu jeda Curtain Wipe selesai baru jalan
-      fallbackTimer = setTimeout(startIntroSequence, 1000);
-    } else {
-      // Jika loading dari nol, tunggu komando resmi dari Preloader bahwa ia telah usai!
-      window.addEventListener("preloader_finished", startIntroSequence, { once: true });
-    }
+    const checkPreloader = () => {
+       if (sessionStorage.getItem("preloader_done")) {
+           clearInterval(pollInterval);
+           // MEMBERIKAN JEDA 1.2 DETIK: Menjamin Black Screen Preloader telah naik habis!
+           seqWaitTimer = setTimeout(startIntroSequence, 1200); 
+       }
+    };
+
+    // Poll setiap 100ms agar event listener tidak pernah missed walau diload berat.
+    pollInterval = setInterval(checkPreloader, 100);
 
     return () => {
       clearTimeout(reelTimer);
       clearTimeout(doneTimer);
-      clearTimeout(fallbackTimer);
-      window.removeEventListener("preloader_finished", startIntroSequence);
+      clearTimeout(seqWaitTimer);
+      clearInterval(pollInterval);
     };
   }, []);
 
@@ -263,11 +268,14 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
 
   const activeItem = items[activeIndex];
 
+  // Global Intro Overlay rendered for BOTH Mobile and Desktop
+  const introComponent = <IntroOverlay introState={introState} items={items} />;
+
   // Mobile Render Mode
   if (isMobile) {
     return (
       <main className="w-full flex flex-col items-center justify-start bg-black min-h-screen relative">
-        <IntroOverlay introState={introState} items={items} />
+        {introComponent}
         
         {/* Mobile Animated Grid Background */}
         <div 
