@@ -36,6 +36,11 @@ export function Preloader() {
           setIsLoading(false);
           sessionStorage.setItem("preloader_done", "true");
           document.body.style.overflow = "";
+          // Memberikan sinyal global ke halaman beranimasi berat (seperti Homepage) 
+          // bahwa tirai sudah terbuka dan aman untuk memulai sekuensinya.
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new Event("preloader_finished"));
+          }
         }, 800); // Tahan persentase di 100% sebentar (dramatic pause 0.8s)
       }
     }, 100);

@@ -142,26 +142,47 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
   const [introState, setIntroState] = useState<"blank" | "text" | "reel" | "done">("blank");
 
   useEffect(() => {
+    // Mobile Intro Sequence Logic (Rapid Reel)
+    // Sekarang tersinkronisasi sehingga ia tidak tumpang tindih dengan Global Preloader
+    let reelTimer: NodeJS.Timeout;
+    let doneTimer: NodeJS.Timeout;
+    let fallbackTimer: NodeJS.Timeout;
+
     const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
     if (hasSeenIntro) {
       setIntroState("done");
-    } else {
+      return;
+    }
+
+    const startIntroSequence = () => {
       setIntroState("text");
       sessionStorage.setItem('hasSeenIntro', 'true');
       
-      const reelTimer = setTimeout(() => {
+      reelTimer = setTimeout(() => {
         setIntroState("reel");
-      }, 2300); // Tunggu teks selesai memudar
+      }, 2300); // Tunggu teks mahakarya melebur
 
-      const doneTimer = setTimeout(() => {
+      doneTimer = setTimeout(() => {
         setIntroState("done");
-      }, 4600); // 2.3 detik durasi reel ditenangkan (2.3s text + 2.3s reel = 4.6s)
+      }, 4600); // Durasi penuh sebelum meledak ke homepage
+    };
 
-      return () => {
-        clearTimeout(reelTimer);
-        clearTimeout(doneTimer);
-      };
+    // Apabila Global Preloader sudah pernah dilewati (misal pindah halaman)
+    const isGlobalPreloaderDone = sessionStorage.getItem("preloader_done");
+    if (isGlobalPreloaderDone) {
+      // Jika ya, tunggu jeda Curtain Wipe selesai baru jalan
+      fallbackTimer = setTimeout(startIntroSequence, 1000);
+    } else {
+      // Jika loading dari nol, tunggu komando resmi dari Preloader bahwa ia telah usai!
+      window.addEventListener("preloader_finished", startIntroSequence, { once: true });
     }
+
+    return () => {
+      clearTimeout(reelTimer);
+      clearTimeout(doneTimer);
+      clearTimeout(fallbackTimer);
+      window.removeEventListener("preloader_finished", startIntroSequence);
+    };
   }, []);
 
   // Upgrade: Generate unique categories for mobile pill navigation
