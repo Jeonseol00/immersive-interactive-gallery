@@ -403,6 +403,33 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     >
       <IntroOverlay introState={introState} items={items} />
 
+      {/* Upgrade 4: Film Grain Overlay */}
+      <div className="absolute inset-0 pointer-events-none z-50 opacity-[0.04] mix-blend-screen" 
+           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
+      />
+
+      {/* Upgrade 3: Ambient Gradient Orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <motion.div 
+          animate={{ 
+            x: ["-10%", "10%", "-10%"],
+            y: ["-10%", "10%", "-10%"],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[20%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-amber-900/20 blur-[120px] mix-blend-screen"
+        />
+        <motion.div 
+          animate={{ 
+            x: ["10%", "-10%", "10%"],
+            y: ["10%", "-10%", "10%"],
+            scale: [1, 1.5, 1]
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-[20%] -right-[10%] w-[60vw] h-[60vw] rounded-full bg-cyan-900/10 blur-[150px] mix-blend-screen"
+        />
+      </div>
+
       {/* Desktop Animated Grid Background */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-20 motion-safe:animate-flow-grid z-0"
@@ -416,18 +443,19 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         }}
       />
       
-      {/* Scattered Ambient Background Images (Interactive Index Mode) */}
+      {/* Upgrade 2: Scattered Ambient Background Images Smooth Morphing */}
       <div className="absolute inset-x-0 inset-y-0 right-0 w-2/3 ml-auto z-0 pointer-events-none">
         <AnimatePresence mode="popLayout">
           {scatteredItems.map((item, index) => (
             <motion.div
-              key={`scatter-${activeIndex}-${item.id}-${index}`}
+              layout
+              key={`scatter-${item.id}`} // Gunakan ID saja, biarkan animasi Framer yang membedakan transisi pergerakannya
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.1, transition: { duration: 0.5 } }}
-              transition={{ duration: 0.8, delay: index * 0.05 }}
+              transition={{ layout: { type: "spring", stiffness: 100, damping: 20 }, opacity: { duration: 0.8 } }}
               className={cn(
-                "scattered-image absolute overflow-hidden rounded-xl mix-blend-screen pointer-events-none border border-white/5",
+                "scattered-image absolute overflow-hidden rounded-xl pointer-events-none border border-white/5 opacity-40 mix-blend-luminosity",
                 scatteredPositions[index]
               )}
             >
@@ -435,7 +463,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
                 src={item.images.thumbnail}
                 alt={item.images.altText}
                 fill
-                className="object-cover grayscale-0 brightness-100"
+                className="object-cover grayscale brightness-75 contrast-125"
                 sizes="33vw"
               />
             </motion.div>
@@ -475,44 +503,66 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         </div>
 
         {/* Right Side: Vast Central Focal Image */}
-        <div className="flex-1 flex justify-center items-center relative h-full pointer-events-none">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`desktop-focal-${activeItem.id}`}
-              initial={{ opacity: 0, x: 80, filter: "blur(15px)" }}
-              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, x: -80, filter: "blur(15px)" }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-full max-w-2xl flex flex-col items-center pointer-events-auto"
-            >
-              <Link 
-                href={`/gallery/${activeItem.slug}`} 
-                className="group relative w-full aspect-[16/10] rounded-[2rem] overflow-hidden shadow-2xl mb-8 border border-white/10 block cursor-pointer transition-transform duration-500 hover:scale-[1.02]"
+        <div className="flex-1 flex flex-col justify-center items-center relative h-full pointer-events-none">
+          
+          {/* Upgrade 1: Crossfade Focal Image */}
+          <div className="relative w-full max-w-2xl aspect-[16/10] mb-8">
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={`desktop-focal-${activeItem.id}`}
+                initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, scale: 1.05, filter: "blur(10px)", zIndex: 10 }}
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0 w-full h-full pointer-events-auto"
               >
-                 <motion.div layoutId={`gallery-image-${activeItem.id}`} className="w-full h-full relative">
-                  <Image 
-                    src={activeItem.images.fullResolution} 
-                    alt={activeItem.title} 
-                    fill 
-                    className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
-                    priority
-                    sizes="50vw"
-                  />
-                 </motion.div>
-                 
-                 {/* Discover Overlay */}
-                 <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div>
-                      <span className="text-amber-400 text-xs font-bold uppercase tracking-widest block mb-2">{activeItem.category}</span>
-                      <h3 className="text-3xl font-black tracking-tight">{activeItem.title}</h3>
-                    </div>
-                    <div className="bg-white text-black px-6 py-3 rounded-full font-bold text-xs tracking-wider uppercase shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                      Explorasi
-                    </div>
-                 </div>
-              </Link>
-            </motion.div>
-          </AnimatePresence>
+                <Link 
+                  href={`/gallery/${activeItem.slug}`} 
+                  className="group relative w-full h-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 block cursor-pointer transition-transform duration-500 hover:scale-[1.02]"
+                >
+                   <motion.div layoutId={`gallery-image-${activeItem.id}`} className="w-full h-full relative">
+                    <Image 
+                      src={activeItem.images.fullResolution} 
+                      alt={activeItem.title} 
+                      fill 
+                      className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
+                      priority
+                      sizes="50vw"
+                    />
+                   </motion.div>
+                </Link>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Upgrade 5: Metadata Info Panel */}
+          <div className="w-full max-w-2xl pointer-events-auto flex justify-between items-end h-[100px] pl-4">
+            <AnimatePresence mode="wait">
+              <motion.div 
+                key={`meta-${activeItem.id}`}
+                initial={{ opacity: 0, y: 15, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -15, filter: "blur(4px)" }}
+                transition={{ duration: 0.4 }}
+                className="flex flex-col gap-2 relative w-2/3"
+              >
+                <span className="text-amber-500 text-xs font-bold uppercase tracking-widest">{activeItem.category}</span>
+                <h3 className="text-3xl lg:text-4xl font-black tracking-tight leading-none">{activeItem.title}</h3>
+                <p className="text-neutral-400 text-sm line-clamp-2 mt-1">{activeItem.interactions.accordionDescription}</p>
+              </motion.div>
+            </AnimatePresence>
+
+            <Link href={`/gallery/${activeItem.slug}`} className="mb-2 shrink-0">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-white text-black px-8 py-4 rounded-full font-black text-[10px] tracking-widest uppercase shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all"
+              >
+                Eksplorasi
+              </motion.button>
+            </Link>
+          </div>
+
         </div>
 
       </div>
