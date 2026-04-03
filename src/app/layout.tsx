@@ -6,6 +6,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { Preloader } from "@/components/ui/Preloader";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
+import { GlobalBackground } from "@/components/ui/GlobalBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,8 @@ export default function RootLayout({
       lang="id"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-neutral-950 text-white selection:bg-amber-500/30">
+      <body className="min-h-full flex flex-col bg-black text-white selection:bg-amber-500/30">
+        <GlobalBackground />
         <CustomCursor />
         <Preloader />
         <ScrollProgress />

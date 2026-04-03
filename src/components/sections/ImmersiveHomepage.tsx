@@ -106,23 +106,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
   return (
     <>
       {isMobile ? (
-        <main className="w-full flex flex-col items-center justify-start bg-black min-h-screen relative">
-          
-          {/* Custom Expert Geometric Contour Background (Global Procedural Topography) */}
-          <div className="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none opacity-60">
-             <motion.div
-               animate={{ rotate: [0, 360] }}
-               transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
-               className="absolute -inset-[100%] w-[300%] h-[300%] origin-[45%_55%]"
-               style={{ backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 30px, rgba(245, 158, 11, 0.2) 30px, rgba(245, 158, 11, 0.2) 31px)` }}
-             />
-             <motion.div
-               animate={{ rotate: [360, 0] }}
-               transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
-               className="absolute -inset-[100%] w-[300%] h-[300%] origin-[55%_45%]"
-               style={{ backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 33px, rgba(245, 158, 11, 0.15) 33px, rgba(245, 158, 11, 0.15) 34px)` }}
-             />
-          </div>
+        <main className="w-full flex flex-col items-center justify-start bg-transparent min-h-screen relative">
 
         {/* Upgrade 3: Scroll Progress Indicator */}
         <motion.div
@@ -277,86 +261,10 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
       ) : (
         <section 
           ref={containerRef}
-          className="relative w-full bg-black flex flex-col font-sans"
+          className="relative w-full bg-transparent flex flex-col font-sans"
         >
 
-      {/* Upgrade 4: Film Grain Overlay */}
-      <div className="absolute inset-0 pointer-events-none z-50 opacity-[0.04] mix-blend-screen" 
-           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
-      />
-
-      {/* Upgrade 3: Global Procedural Topography & Ambient Orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-[0]">
-        
-        {/* Base Layer: Global Topography untuk mengikat Zona 1, 2, dan 3 */}
-        <motion.div
-           animate={{ rotate: [0, 360] }}
-           transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
-           className="absolute -inset-[100%] w-[300%] h-[300%] origin-[45%_55%] opacity-60"
-           style={{ 
-             backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 35px, rgba(245, 158, 11, 0.25) 35px, rgba(245, 158, 11, 0.25) 36px)`
-           }}
-        />
-        <motion.div
-           animate={{ rotate: [360, 0] }}
-           transition={{ duration: 140, repeat: Infinity, ease: "linear" }}
-           className="absolute -inset-[100%] w-[300%] h-[300%] origin-[55%_45%] opacity-60"
-           style={{ 
-             backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 38px, rgba(245, 158, 11, 0.15) 38px, rgba(245, 158, 11, 0.15) 39px)`
-           }}
-        />
-
-        {/* Subtle Vignette Spotlight */}
-        <div className="absolute inset-0 z-[1]" style={{ background: "radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 100%)" }} />
-        
-        {/* Floating Dust Particles */}
-        {Array.from({ length: 30 }).map((_, i) => {
-          const size = Math.random() * 2 + 1;
-          const left = Math.random() * 100;
-          return (
-            <motion.div
-              key={`dust-${i}`}
-              className="absolute bg-white rounded-full mix-blend-screen opacity-40"
-              style={{ width: size, height: size, left: `${left}%`, top: "110%" }}
-              animate={{ y: ["0vh", "-120vh"], x: [0, (Math.random() - 0.5) * 60] }}
-              transition={{ duration: Math.random() * 20 + 20, repeat: Infinity, ease: "linear", delay: -(Math.random() * 40) }}
-            />
-          );
-        })}
-
-        {/* Orb 1: Amber Hangat (Kiri-Atas) */}
-        <motion.div 
-          animate={{ 
-            x: ["-5%", "15%", "-5%"],
-            y: ["-5%", "15%", "-5%"],
-            scale: [1, 1.3, 1]
-          }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[15%] -left-[5%] w-[55vw] h-[55vw] rounded-full bg-amber-800/40 blur-[100px]"
-        />
-        {/* Orb 2: Cyan Dingin (Kanan-Bawah) */}
-        <motion.div 
-          animate={{ 
-            x: ["10%", "-15%", "10%"],
-            y: ["5%", "-10%", "5%"],
-            scale: [1, 1.4, 1]
-          }}
-          transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-[15%] -right-[5%] w-[55vw] h-[55vw] rounded-full bg-cyan-800/25 blur-[100px]"
-        />
-        {/* Orb 3: Rose Hangat (Tengah) */}
-        <motion.div 
-          animate={{ 
-            x: ["-8%", "8%", "-8%"],
-            y: ["8%", "-8%", "8%"],
-            scale: [1, 1.2, 1]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[30%] left-[25%] w-[40vw] h-[40vw] rounded-full bg-rose-900/15 blur-[120px]"
-        />
-      </div>
-
-      {/* Grid dihapus — digantikan Living Aurora */}
+      {/* Latar Belakang Global telah di-refactor ke komponen GlobalBackground dalam layout.tsx */}
 
       {/* ZONA 1: Cinematic Hero Desktop */}
       <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 overflow-visible bg-transparent">
