@@ -32,13 +32,13 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
            key="intro-text"
            initial={{ opacity: 0 }}
            animate={{ opacity: 1 }}
-           exit={{ opacity: 0, scale: 1.1, filter: "blur(15px)", transition: { duration: 0.4 } }}
+           exit={{ opacity: 0, scale: 1.1, transition: { duration: 0.4 } }}
            className="absolute inset-0 flex flex-col items-center justify-center gap-3 lg:gap-4 z-20"
          >
            <div className="overflow-hidden px-4 py-2">
               <motion.h2 
-                 initial={{ filter: "blur(12px)", opacity: 0, y: 30, scale: 0.95 }}
-                 animate={{ filter: "blur(0px)", opacity: 1, y: 0, scale: 1 }}
+                 initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                 animate={{ opacity: 1, y: 0, scale: 1 }}
                  transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
                  className="text-3xl md:text-5xl font-mono tracking-widest uppercase text-neutral-400"
               >
@@ -48,8 +48,8 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
            
            <div className="overflow-hidden px-4 py-2">
               <motion.h2 
-                 initial={{ filter: "blur(15px)", opacity: 0, y: 40, scale: 0.9 }}
-                 animate={{ filter: "blur(0px)", opacity: 1, y: 0, scale: 1 }}
+                 initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                 animate={{ opacity: 1, y: 0, scale: 1 }}
                  transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.8 }}
                  className="text-5xl md:text-7xl font-black text-amber-500 tracking-tighter"
               >
@@ -71,10 +71,10 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
           >
              {/* Pilar 1 - Laju Konstan */}
              <motion.div 
-               initial={{ y: "100vh" }} 
-               animate={{ y: "-130vh" }} 
-               transition={{ duration: 2.2, ease: "circIn" }}
-               className="flex flex-col gap-4 -translate-y-12"
+               initial={{ y: "100%" }} 
+               animate={{ y: "-100%" }} 
+               transition={{ duration: 2.2, ease: "linear" }}
+               className="flex flex-col gap-4"
              >
                 {[...items.slice(0, 5), ...items.slice(0, 2)].map((item, i) => (
                   <div key={`c1-${i}`} className="relative w-32 h-48 md:w-56 md:h-80 rounded-[1.5rem] shadow-2xl brightness-75 sepia-[.2] overflow-hidden border border-white/10 shrink-0">
@@ -85,10 +85,10 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
 
              {/* Pilar 2 - Laju Tertinggi & Kedalaman Visual (Parallax Jauh) */}
              <motion.div 
-               initial={{ y: "120vh" }} 
-               animate={{ y: "-180vh" }} 
-               transition={{ duration: 2.1, ease: "circIn" }}
-               className="flex flex-col gap-4 translate-y-32 z-[-1]"
+               initial={{ y: "150%" }} 
+               animate={{ y: "-150%" }} 
+               transition={{ duration: 2.1, ease: "linear" }}
+               className="flex flex-col gap-4 z-[-1]"
              >
                 {[...items.slice(3, 8).reverse(), ...items.slice(3, 5)].map((item, i) => (
                   <div key={`c2-${i}`} className="relative w-32 h-48 md:w-56 md:h-80 rounded-[1.5rem] shadow-2xl brightness-50 sepia-[.4] overflow-hidden border border-white/10 shrink-0">
@@ -99,10 +99,10 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
 
              {/* Pilar 3 - Sedang (Dekstop Saja) */}
              <motion.div 
-               initial={{ y: "80vh" }} 
-               animate={{ y: "-150vh" }} 
-               transition={{ duration: 2.3, ease: "circIn" }}
-               className="flex flex-col gap-4 -translate-y-32 hidden md:flex"
+               initial={{ y: "80%" }} 
+               animate={{ y: "-100%" }} 
+               transition={{ duration: 2.3, ease: "linear" }}
+               className="flex flex-col gap-4 hidden md:flex"
              >
                 {[...items.slice(6, 9), ...items.slice(0, 4)].map((item, i) => (
                   <div key={`c3-${i}`} className="relative w-32 h-48 md:w-56 md:h-80 rounded-[1.5rem] shadow-2xl brightness-75 sepia-[.2] overflow-hidden border border-white/10 shrink-0">
