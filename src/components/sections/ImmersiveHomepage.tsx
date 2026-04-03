@@ -37,9 +37,9 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
          >
            <div className="overflow-hidden px-4 py-2">
               <motion.h2 
-                 initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+                 initial={{ opacity: 0, y: 50 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
                  className="text-3xl md:text-5xl font-mono tracking-widest uppercase text-neutral-400"
               >
                  Setiap Karya
@@ -48,9 +48,9 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
            
            <div className="overflow-hidden px-4 py-2">
               <motion.h2 
-                 initial={{ opacity: 0, y: 40, scale: 0.9 }}
-                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.8 }}
+                 initial={{ opacity: 0, y: 50 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.6 }}
                  className="text-5xl md:text-7xl font-black text-amber-500 tracking-tighter"
               >
                  Punya Cerita.
@@ -149,7 +149,11 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
 
     const startIntroSequence = () => {
       setIntroState("text");
-      sessionStorage.setItem('hasSeenEpicIntro_v4', 'true');
+      try {
+        sessionStorage.setItem('hasSeenEpicIntro_v4', 'true');
+      } catch (e) {
+        console.warn("Storage restricted", e);
+      }
       
       // Tahap 1: Teks 'Setiap Karya Punya Cerita' dipasang selama 3 Detik
       reelTimer = setTimeout(() => {
@@ -163,14 +167,25 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     };
 
     const checkPreloader = () => {
-       if (sessionStorage.getItem("preloader_done")) {
-           clearInterval(pollInterval);
-           // MEMBERIKAN JEDA 1.2 DETIK: Menjamin Black Screen Preloader telah naik habis!
-           seqWaitTimer = setTimeout(startIntroSequence, 1200); 
+       try {
+         if (sessionStorage.getItem("preloader_done")) {
+             clearInterval(pollInterval);
+             seqWaitTimer = setTimeout(startIntroSequence, 1200); 
+         }
+       } catch (e) {
+         clearInterval(pollInterval);
+         seqWaitTimer = setTimeout(startIntroSequence, 3500); 
        }
     };
 
-    // Poll setiap 100ms agar event listener tidak pernah missed walau diload berat.
+    // Sinkronisasi via Listener yang lebih aman tanpa overhead Interval
+    const handlePreloaderDoneEvent = () => {
+       clearInterval(pollInterval);
+       seqWaitTimer = setTimeout(startIntroSequence, 1200);
+    };
+    window.addEventListener("preloader_finished", handlePreloaderDoneEvent);
+
+    // Poll fallback setiap 100ms
     pollInterval = setInterval(checkPreloader, 100);
 
     return () => {
@@ -178,6 +193,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
       clearTimeout(doneTimer);
       clearTimeout(seqWaitTimer);
       clearInterval(pollInterval);
+      window.removeEventListener("preloader_finished", handlePreloaderDoneEvent);
     };
   }, []);
 
