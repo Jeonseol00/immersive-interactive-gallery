@@ -18,8 +18,9 @@ export function Preloader() {
     fetch("/api/gallery?page=1&limit=10")
       .then((res) => res.json())
       .then((data) => {
-        if (data.items) {
-          const images = data.items.map((item: { images: { thumbnail: string } }) => item.images.thumbnail);
+        const items = data.galleryItems || data.items || [];
+        if (items.length > 0) {
+          const images = items.map((item: { images: { thumbnail: string } }) => item.images.thumbnail);
           setReelImages(images);
         }
       })
