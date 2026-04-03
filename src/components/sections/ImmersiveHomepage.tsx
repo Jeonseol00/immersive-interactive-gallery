@@ -108,30 +108,8 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
       {isMobile ? (
         <main className="w-full flex flex-col items-center justify-start bg-black min-h-screen relative">
           
-          {/* Mobile Animated Grid Background */}
-        <div 
-          className="fixed inset-0 pointer-events-none opacity-20 motion-safe:animate-flow-grid z-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: "40px 40px",
-            backgroundPosition: "0 0"
-          }}
-        />
-
-        {/* Upgrade 3: Scroll Progress Indicator */}
-        <motion.div
-          className="fixed top-16 md:top-20 left-0 right-0 h-[3px] bg-amber-500 origin-left z-50 shadow-[0_0_12px_rgba(245,158,11,0.6)]"
-          style={{ scaleX }}
-        />
-
-        {/* Upgrade 6: Cinematic Hero Section (Lobi Galeri) */}
-        <section className="relative w-full h-[100dvh] flex flex-col items-center justify-center overflow-hidden z-10 bg-black">
-          
-          {/* Custom Expert Geometric Contour Background (Procedural Topography) */}
-          <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none opacity-60">
+          {/* Custom Expert Geometric Contour Background (Global Procedural Topography) */}
+          <div className="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none opacity-60">
              <motion.div
                animate={{ rotate: [0, 360] }}
                transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
@@ -145,6 +123,15 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
                style={{ backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 33px, rgba(245, 158, 11, 0.15) 33px, rgba(245, 158, 11, 0.15) 34px)` }}
              />
           </div>
+
+        {/* Upgrade 3: Scroll Progress Indicator */}
+        <motion.div
+          className="fixed top-16 md:top-20 left-0 right-0 h-[3px] bg-amber-500 origin-left z-50 shadow-[0_0_12px_rgba(245,158,11,0.6)]"
+          style={{ scaleX }}
+        />
+
+        {/* Upgrade 6: Cinematic Hero Section (Lobi Galeri) */}
+        <section className="relative w-full h-[100dvh] flex flex-col items-center justify-center overflow-hidden z-10 bg-transparent">
 
           <div className="absolute inset-0 w-full h-full pointer-events-none z-[1]">
              {/* THE DROP REVEALER: Focus pull dari atas ke bawah */}
@@ -295,10 +282,29 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
       />
 
-      {/* Upgrade 3: Ambient Gradient Orbs & Living Aurora */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-[1]">
+      {/* Upgrade 3: Global Procedural Topography & Ambient Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-[0]">
+        
+        {/* Base Layer: Global Topography untuk mengikat Zona 1, 2, dan 3 */}
+        <motion.div
+           animate={{ rotate: [0, 360] }}
+           transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
+           className="absolute -inset-[100%] w-[300%] h-[300%] origin-[45%_55%] opacity-60"
+           style={{ 
+             backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 35px, rgba(245, 158, 11, 0.25) 35px, rgba(245, 158, 11, 0.25) 36px)`
+           }}
+        />
+        <motion.div
+           animate={{ rotate: [360, 0] }}
+           transition={{ duration: 140, repeat: Infinity, ease: "linear" }}
+           className="absolute -inset-[100%] w-[300%] h-[300%] origin-[55%_45%] opacity-60"
+           style={{ 
+             backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 38px, rgba(245, 158, 11, 0.15) 38px, rgba(245, 158, 11, 0.15) 39px)`
+           }}
+        />
+
         {/* Subtle Vignette Spotlight */}
-        <div className="absolute inset-0 z-10" style={{ background: "radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 100%)" }} />
+        <div className="absolute inset-0 z-[1]" style={{ background: "radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 100%)" }} />
         
         {/* Floating Dust Particles */}
         {Array.from({ length: 30 }).map((_, i) => {
@@ -350,29 +356,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
       {/* Grid dihapus — digantikan Living Aurora */}
 
       {/* ZONA 1: Cinematic Hero Desktop */}
-      <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 overflow-hidden bg-black">
-        
-        {/* Custom Seamless Procedural Topography Background */}
-        <div className="absolute inset-0 w-full h-full z-0 overflow-hidden opacity-60 pointer-events-none">
-          {/* Layer 1: Organik kontur bergerak */}
-          <motion.div
-             animate={{ rotate: [0, 360] }}
-             transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
-             className="absolute -inset-[100%] w-[300%] h-[300%] origin-[45%_55%]"
-             style={{ 
-               backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 35px, rgba(245, 158, 11, 0.25) 35px, rgba(245, 158, 11, 0.25) 36px)`
-             }}
-          />
-          {/* Layer 2: Offset kontur untuk efek Moiré (topografi natural) */}
-          <motion.div
-             animate={{ rotate: [360, 0] }}
-             transition={{ duration: 140, repeat: Infinity, ease: "linear" }}
-             className="absolute -inset-[100%] w-[300%] h-[300%] origin-[55%_45%]"
-             style={{ 
-               backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 38px, rgba(245, 158, 11, 0.15) 38px, rgba(245, 158, 11, 0.15) 39px)`
-             }}
-          />
-        </div>
+      <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 overflow-hidden bg-transparent">
 
         {/* Dynamic Gradient Mask for Text Contrast */}
         <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_80%)] pointer-events-none" />
