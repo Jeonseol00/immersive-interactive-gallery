@@ -1,8 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export function GlobalBackground() {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <>
       {/* Upgrade 4: Film Grain Overlay (Global) */}
@@ -34,8 +41,8 @@ export function GlobalBackground() {
         {/* Subtle Vignette Spotlight OVER Topography */}
         <div className="absolute inset-0 z-10" style={{ background: "radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 100%)" }} />
         
-        {/* Floating Dust Particles */}
-        {Array.from({ length: 30 }).map((_, i) => {
+        {/* Floating Dust Particles - Rendered Only On Client to prevent SSR Hydration Mismatch with Math.random() */}
+        {mounted && Array.from({ length: 30 }).map((_, i) => {
           const size = Math.random() * 2 + 1;
           const left = Math.random() * 100;
           return (
