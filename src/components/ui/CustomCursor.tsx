@@ -25,8 +25,13 @@ export function CustomCursor() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Check if device has a fine pointer (mouse)
-    if (!window.matchMedia("(pointer: fine)").matches) {
+    if (typeof window === "undefined") return;
+
+    // Robust touch & mobile screen detection
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth < 768;
+    
+    // Check if device has a fine pointer (mouse) AND is not a touch device
+    if (isTouch || !window.matchMedia("(pointer: fine)").matches) {
       setIsPointerDevice(false);
       return;
     }
