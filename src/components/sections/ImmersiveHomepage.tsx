@@ -128,10 +128,10 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         />
 
         {/* Upgrade 6: Cinematic Hero Section (Lobi Galeri) */}
-        <section className="relative w-full h-[100dvh] flex flex-col items-center justify-center overflow-hidden z-10 bg-neutral-950">
+        <section className="relative w-full h-[100dvh] flex flex-col items-center justify-center overflow-hidden z-10 bg-black">
           
           {/* Custom Expert Geometric Contour Background (Procedural Topography) */}
-          <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none opacity-40">
+          <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none opacity-60">
              <motion.div
                animate={{ rotate: [0, 360] }}
                transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
@@ -350,17 +350,17 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
       {/* Grid dihapus — digantikan Living Aurora */}
 
       {/* ZONA 1: Cinematic Hero Desktop */}
-      <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 overflow-hidden bg-neutral-950">
+      <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 overflow-hidden bg-black">
         
         {/* Custom Seamless Procedural Topography Background */}
-        <div className="absolute inset-0 w-full h-full z-0 overflow-hidden opacity-30 pointer-events-none">
+        <div className="absolute inset-0 w-full h-full z-0 overflow-hidden opacity-60 pointer-events-none">
           {/* Layer 1: Organik kontur bergerak */}
           <motion.div
              animate={{ rotate: [0, 360] }}
              transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
              className="absolute -inset-[100%] w-[300%] h-[300%] origin-[45%_55%]"
              style={{ 
-               backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 35px, rgba(245, 158, 11, 0.15) 35px, rgba(245, 158, 11, 0.15) 36px)`
+               backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 35px, rgba(245, 158, 11, 0.25) 35px, rgba(245, 158, 11, 0.25) 36px)`
              }}
           />
           {/* Layer 2: Offset kontur untuk efek Moiré (topografi natural) */}
@@ -369,7 +369,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
              transition={{ duration: 140, repeat: Infinity, ease: "linear" }}
              className="absolute -inset-[100%] w-[300%] h-[300%] origin-[55%_45%]"
              style={{ 
-               backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 38px, rgba(245, 158, 11, 0.1) 38px, rgba(245, 158, 11, 0.1) 39px)`
+               backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 38px, rgba(245, 158, 11, 0.15) 38px, rgba(245, 158, 11, 0.15) 39px)`
              }}
           />
         </div>
@@ -377,19 +377,8 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         {/* Dynamic Gradient Mask for Text Contrast */}
         <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_80%)] pointer-events-none" />
 
-        {/* Hero Typography — DIPINDAHKAN KE BELAKANG GAMBAR MELAYANG */}
-        <motion.div 
-           initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
-           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-           transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-           className="flex flex-col items-center text-center relative z-[2] pointer-events-none"
-        >
-          <h1 className="text-[12vw] font-black tracking-tighter text-white drop-shadow-[0_0_50px_rgba(245,158,11,0.15)] leading-none">IMGAL</h1>
-          <p className="text-amber-500 font-bold uppercase tracking-[0.5em] text-sm mt-8">Ruang Digital Mahakarya Abadi</p>
-        </motion.div>
-
-        {/* Hero Scattered Gallery — DINAIIKAN Z-INDEX NYA (z-10) UNTUK MENUTUPI TEKS */}
-        <div className="absolute inset-0 z-[10] pointer-events-none">
+        {/* Hero Scattered Gallery — DITENGAH TEKS DAN TOPOGRAFI (z-2) */}
+        <div className="absolute inset-0 z-[2] pointer-events-none">
           {heroScatteredItems.map((item, index) => (
             <motion.div
               key={`hero-scatter-${index}`}
@@ -412,6 +401,17 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
             </motion.div>
           ))}
         </div>
+
+        {/* Hero Typography — PALING DEPAN (Z-20) SESUAI TATA LETAK ZONA 1 PADA UMUMNYA */}
+        <motion.div 
+           initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+           transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+           className="flex flex-col items-center text-center relative z-20 pointer-events-none"
+        >
+          <h1 className="text-[12vw] font-black tracking-tighter text-white drop-shadow-2xl leading-none">IMGAL</h1>
+          <p className="text-amber-500 font-bold uppercase tracking-[0.5em] text-sm mt-8">Ruang Digital Mahakarya Abadi</p>
+        </motion.div>
 
         <motion.button 
           initial={{ opacity: 0, y: 30 }}
