@@ -5,8 +5,8 @@ export default async function Home() {
   const items = await fetchGalleryItems(1, 10);
 
   return (
-    <main className="w-full min-h-screen bg-black">
+    <div className="w-full min-h-screen bg-transparent">
       <ImmersiveHomepage items={items} />
-    </main>
+    </div>
   );
 }

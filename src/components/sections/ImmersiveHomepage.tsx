@@ -178,7 +178,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         </section>
 
         {/* Zona 2: Feed "Ruang Pameran" */}
-        <div className="w-full relative z-20 bg-black">
+        <div className="w-full relative z-20 bg-transparent">
           {/* Upgrade 2: Category Pills Navigation */}
           <div className="w-full overflow-x-auto no-scrollbar py-4 px-6 mb-6 sticky top-16 md:top-20 z-40 bg-black/80 backdrop-blur-xl border-b border-t border-white/10">
             <div className="flex gap-3">
