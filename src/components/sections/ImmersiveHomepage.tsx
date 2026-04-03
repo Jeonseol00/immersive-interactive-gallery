@@ -399,7 +399,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-screen flex flex-col pt-24 pb-20 w-full overflow-hidden bg-black"
+      className="relative w-full bg-black flex flex-col font-sans"
     >
       <IntroOverlay introState={introState} items={items} />
 
@@ -408,25 +408,55 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
       />
 
-      {/* Upgrade 3: Ambient Gradient Orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      {/* Upgrade 3: Ambient Gradient Orbs & Living Aurora */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-[1]">
+        {/* Subtle Vignette Spotlight */}
+        <div className="absolute inset-0 z-10" style={{ background: "radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 100%)" }} />
+        
+        {/* Floating Dust Particles */}
+        {Array.from({ length: 30 }).map((_, i) => {
+          const size = Math.random() * 2 + 1;
+          const left = Math.random() * 100;
+          return (
+            <motion.div
+              key={`dust-${i}`}
+              className="absolute bg-white rounded-full mix-blend-screen opacity-40"
+              style={{ width: size, height: size, left: `${left}%`, top: "110%" }}
+              animate={{ y: ["0vh", "-120vh"], x: [0, (Math.random() - 0.5) * 60] }}
+              transition={{ duration: Math.random() * 20 + 20, repeat: Infinity, ease: "linear", delay: -(Math.random() * 40) }}
+            />
+          );
+        })}
+
+        {/* Orb 1: Amber Hangat (Kiri-Atas) */}
         <motion.div 
           animate={{ 
-            x: ["-10%", "10%", "-10%"],
-            y: ["-10%", "10%", "-10%"],
+            x: ["-5%", "15%", "-5%"],
+            y: ["-5%", "15%", "-5%"],
+            scale: [1, 1.3, 1]
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[15%] -left-[5%] w-[55vw] h-[55vw] rounded-full bg-amber-800/40 blur-[100px]"
+        />
+        {/* Orb 2: Cyan Dingin (Kanan-Bawah) */}
+        <motion.div 
+          animate={{ 
+            x: ["10%", "-15%", "10%"],
+            y: ["5%", "-10%", "5%"],
+            scale: [1, 1.4, 1]
+          }}
+          transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-[15%] -right-[5%] w-[55vw] h-[55vw] rounded-full bg-cyan-800/25 blur-[100px]"
+        />
+        {/* Orb 3: Rose Hangat (Tengah) */}
+        <motion.div 
+          animate={{ 
+            x: ["-8%", "8%", "-8%"],
+            y: ["8%", "-8%", "8%"],
             scale: [1, 1.2, 1]
           }}
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[20%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-amber-900/20 blur-[120px] mix-blend-screen"
-        />
-        <motion.div 
-          animate={{ 
-            x: ["10%", "-10%", "10%"],
-            y: ["10%", "-10%", "10%"],
-            scale: [1, 1.5, 1]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-[20%] -right-[10%] w-[60vw] h-[60vw] rounded-full bg-cyan-900/10 blur-[150px] mix-blend-screen"
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[30%] left-[25%] w-[40vw] h-[40vw] rounded-full bg-rose-900/15 blur-[120px]"
         />
       </div>
 
@@ -444,7 +474,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
       />
       
       {/* Upgrade 2: Scattered Ambient Background Images Smooth Morphing */}
-      <div className="absolute inset-x-0 inset-y-0 right-0 w-2/3 ml-auto z-0 pointer-events-none">
+      <div className="fixed h-screen inset-x-0 inset-y-0 right-0 w-2/3 ml-auto z-[2] pointer-events-none">
         <AnimatePresence mode="popLayout">
           {scatteredItems.map((item, index) => (
             <motion.div
@@ -471,7 +501,32 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         </AnimatePresence>
       </div>
 
-      <div className="container mx-auto px-12 relative z-10 flex flex-row min-h-[75vh] gap-16 items-center">
+      {/* ZONA 1: Cinematic Hero Desktop */}
+      <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 border-b border-white/10">
+        <motion.div 
+           initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+           transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+           className="flex flex-col items-center text-center mix-blend-screen"
+        >
+          <h1 className="text-[12vw] font-black tracking-tighter text-white drop-shadow-2xl leading-none">IMGAL</h1>
+          <p className="text-amber-500 font-bold uppercase tracking-[0.5em] text-sm mt-8">Ruang Digital Mahakarya Abadi</p>
+        </motion.div>
+
+        <motion.button 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 1 }}
+          className="absolute bottom-12 flex flex-col items-center gap-6 group cursor-pointer pointer-events-auto"
+          onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
+        >
+          <span className="text-[10px] font-black text-white/50 uppercase tracking-[0.3em] group-hover:text-amber-400 transition-colors">Jelajahi Koleksi</span>
+          <div className="w-px h-16 bg-gradient-to-b from-white/50 to-transparent group-hover:from-amber-400 transition-colors" />
+        </motion.button>
+      </div>
+
+      {/* ZONA 2: Interactive Gallery Index */}
+      <div className="container mx-auto px-12 relative z-10 flex flex-row min-h-screen gap-16 items-center shrink-0">
         
         {/* Left Side: Interactive Text Index */}
         <div className="w-1/3 flex flex-col shrink-0 gap-8 h-full justify-center">
@@ -505,8 +560,8 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         {/* Right Side: Vast Central Focal Image */}
         <div className="flex-1 flex flex-col justify-center items-center relative h-full pointer-events-none">
           
-          {/* Upgrade 1: Crossfade Focal Image */}
-          <div className="relative w-full max-w-2xl aspect-[16/10] mb-8">
+          {/* Upgrade 1: Crossfade Focal Image — Proporsi Diperkecil */}
+          <div className="relative w-full max-w-xl aspect-[3/2] mb-8">
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={`desktop-focal-${activeItem.id}`}
@@ -530,41 +585,40 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
                       sizes="50vw"
                     />
                    </motion.div>
+
+                   {/* Hover Discover Overlay Internal */}
+                   <div className="absolute inset-0 bg-neutral-950/10 mix-blend-overlay pointer-events-none group-hover:bg-neutral-950/70 transition-colors duration-700"></div>
+                   
+                   {/* Metadata Muncul Saat Hover (Zone 2) */}
+                   <div className="absolute inset-0 p-10 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="translate-y-8 group-hover:translate-y-0 transition-transform duration-700 ease-[0.22,1,0.36,1]">
+                        <span className="text-amber-400 text-xs font-bold uppercase tracking-widest block mb-3">{activeItem.category}</span>
+                        <h3 className="text-4xl lg:text-5xl font-black tracking-tight leading-none text-white drop-shadow-lg">{activeItem.title}</h3>
+                        <p className="text-white/80 text-sm mt-4 line-clamp-3 max-w-md">{activeItem.interactions.accordionDescription}</p>
+                        <div className="bg-white text-black px-6 py-3 rounded-full font-bold text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(255,255,255,0.2)] mt-6 inline-block w-fit hover:scale-105 active:scale-95 transition-transform">
+                          Lihat Mahakarya
+                        </div>
+                      </div>
+                   </div>
                 </Link>
               </motion.div>
             </AnimatePresence>
           </div>
-
-          {/* Upgrade 5: Metadata Info Panel */}
-          <div className="w-full max-w-2xl pointer-events-auto flex justify-between items-end h-[100px] pl-4">
-            <AnimatePresence mode="wait">
-              <motion.div 
-                key={`meta-${activeItem.id}`}
-                initial={{ opacity: 0, y: 15, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -15, filter: "blur(4px)" }}
-                transition={{ duration: 0.4 }}
-                className="flex flex-col gap-2 relative w-2/3"
-              >
-                <span className="text-amber-500 text-xs font-bold uppercase tracking-widest">{activeItem.category}</span>
-                <h3 className="text-3xl lg:text-4xl font-black tracking-tight leading-none">{activeItem.title}</h3>
-                <p className="text-neutral-400 text-sm line-clamp-2 mt-1">{activeItem.interactions.accordionDescription}</p>
-              </motion.div>
-            </AnimatePresence>
-
-            <Link href={`/gallery/${activeItem.slug}`} className="mb-2 shrink-0">
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-white text-black px-8 py-4 rounded-full font-black text-[10px] tracking-widest uppercase shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all"
-              >
-                Eksplorasi
-              </motion.button>
-            </Link>
-          </div>
-
         </div>
 
+      </div>
+
+      {/* ZONA 3: Closing Statement */}
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center relative z-10 bg-black/60 border-t border-white/5 shrink-0 backdrop-blur-md">
+         <h2 className="text-4xl md:text-5xl font-mono tracking-widest uppercase text-neutral-600 mb-8 text-center">Setiap Karya<br/><span className="text-amber-500 font-black">Punya Cerita.</span></h2>
+         <div className="flex gap-4 pointer-events-auto">
+           <Link href="/about" className="px-8 py-4 rounded-full border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-colors">
+              Tentang Kami
+           </Link>
+           <Link href="/contact" className="px-8 py-4 rounded-full bg-white text-black text-[10px] font-bold uppercase tracking-[0.2em] hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-transform">
+              Hubungi Kami
+           </Link>
+         </div>
       </div>
     </section>
   );
