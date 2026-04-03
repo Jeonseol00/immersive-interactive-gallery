@@ -186,15 +186,21 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Prepare scattered items for Hero background (Desktop Only) — lebih banyak & tersebar penuh layar
+  // Prepare scattered items for Hero background (Desktop Only) — statis & tersebar penuh layar
   const heroScatteredItems = useMemo(() => {
-    // Gunakan semua item, loop jika kurang dari 8
     const result = [];
     for (let i = 0; i < 8; i++) {
       result.push(items[i % items.length]);
     }
     return result;
   }, [items]);
+
+  // Prepare scattered items for Zone 2 Card Shuffle (Desktop Only) — dinamis berdasarkan activeIndex
+  const zone2ScatteredItems = useMemo(() => {
+    const list = [...items];
+    const itemHole = list.splice(activeIndex, 1)[0];
+    return [itemHole, ...list].slice(0, 4);
+  }, [items, activeIndex]);
 
   useEffect(() => {
     if (prefersReducedMotion || typeof window === "undefined" || isMobile) return;
@@ -230,6 +236,14 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     "bottom-[5%] left-[30%] w-[170px] h-[240px]",
     "bottom-[10%] right-[25%] w-[190px] h-[260px]",
     "bottom-[6%] right-[2%] w-[210px] h-[290px]",
+  ];
+
+  // Posisi melayang untuk Zone 2 (disekitar Focal Image)
+  const zone2ScatteredPositions = [
+    "top-0 -right-[5%] w-[350px] h-[450px] opacity-40",
+    "-bottom-[5%] -left-[5%] w-[300px] h-[400px] opacity-30",
+    "top-[45%] -left-[10%] w-[400px] h-[300px] opacity-50",
+    "top-[15%] -left-[2%] w-[250px] h-[250px] opacity-20",
   ];
 
   const activeItem = items[activeIndex];
@@ -558,11 +572,40 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
           </div>
         </div>
 
-        {/* Right Side: Vast Central Focal Image */}
+        {/* Right Side: Vast Central Focal Image & Zone 2 Scattered Ambient */}
         <div className="flex-1 flex flex-col justify-center items-center relative h-full pointer-events-none">
           
+          {/* Scattered Ambient Card Shuffle di balik Focal Image */}
+          <div className="absolute inset-0 pointer-events-none z-0">
+            <AnimatePresence mode="popLayout">
+              {zone2ScatteredItems.map((item, index) => (
+                <motion.div
+                  layout
+                  key={`zone2-scatter-${item.id}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.1, transition: { duration: 0.5 } }}
+                  transition={{ layout: { type: "spring", stiffness: 100, damping: 20 }, opacity: { duration: 0.8 } }}
+                  className={cn(
+                    "scattered-image absolute overflow-hidden rounded-xl border border-white/5 mix-blend-luminosity",
+                    zone2ScatteredPositions[index]
+                  )}
+                >
+                  <Image
+                    src={item.images.thumbnail}
+                    alt=""
+                    fill
+                    className="object-cover grayscale brightness-75 contrast-125"
+                    sizes="33vw"
+                    quality={30}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
           {/* Upgrade 1: Crossfade Focal Image — Proporsi Diperkecil */}
-          <div className="relative w-full max-w-xl aspect-[3/2] mb-8">
+          <div className="relative w-full max-w-xl aspect-[3/2] mb-8 z-10">
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={`desktop-focal-${activeItem.id}`}
