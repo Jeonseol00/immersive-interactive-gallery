@@ -262,13 +262,13 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
   // Global Intro Overlay rendered for BOTH Mobile and Desktop
   const introComponent = <IntroOverlay introState={introState} items={items} />;
 
-  // Mobile Render Mode
-  if (isMobile) {
-    return (
-      <main className="w-full flex flex-col items-center justify-start bg-black min-h-screen relative">
-        {introComponent}
-        
-        {/* Mobile Animated Grid Background */}
+  return (
+    <>
+      {introComponent}
+      {isMobile ? (
+        <main className="w-full flex flex-col items-center justify-start bg-black min-h-screen relative">
+          
+          {/* Mobile Animated Grid Background */}
         <div 
           className="fixed inset-0 pointer-events-none opacity-20 motion-safe:animate-flow-grid z-0"
           style={{
@@ -424,19 +424,14 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
               </div>
             </motion.div>
           ))}
+          </div>
         </div>
-        </div>
-      </main>
-    );
-  }
-
-  // Desktop Render Mode
-  return (
-    <section 
-      ref={containerRef}
-      className="relative w-full bg-black flex flex-col font-sans"
-    >
-      <IntroOverlay introState={introState} items={items} />
+        </main>
+      ) : (
+        <section 
+          ref={containerRef}
+          className="relative w-full bg-black flex flex-col font-sans"
+        >
 
       {/* Upgrade 4: Film Grain Overlay */}
       <div className="absolute inset-0 pointer-events-none z-50 opacity-[0.04] mix-blend-screen" 
@@ -758,5 +753,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
          </motion.div>
       </motion.div>
     </section>
+    )}
+    </>
   );
 }
