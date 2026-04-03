@@ -1,11 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import { usePathname } from "next/navigation";
 
 export function CustomCursor() {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  // Gunakan MotionValue untuk menghindari re-render React berulang pada setiap frame mousemove
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+
+  // Fisika pegas yang sangat ringan dan responsif (tanpa lag)
+  const springConfigInner = { damping: 30, stiffness: 600, mass: 0.1 };
+  const pointX = useSpring(cursorX, springConfigInner);
+  const pointY = useSpring(cursorY, springConfigInner);
+
+  const springConfigOuter = { damping: 25, stiffness: 200, mass: 0.5 };
+  const outerX = useSpring(cursorX, springConfigOuter);
+  const outerY = useSpring(cursorY, springConfigOuter);
+
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -23,7 +35,8 @@ export function CustomCursor() {
     document.body.style.cursor = "none";
 
     const moveCursor = (e: MouseEvent) => {
-      setPosition({ x: e.clientX, y: e.clientY });
+      cursorX.set(e.clientX);
+      cursorY.set(e.clientY);
       if (!isVisible) setIsVisible(true);
     };
     
@@ -98,35 +111,33 @@ export function CustomCursor() {
       {/* Dot Utama */}
       <motion.div
         className="fixed top-0 left-0 w-3 h-3 rounded-full pointer-events-none z-[10000]"
+        style={{
+          x: pointX,
+          y: pointY,
+          translateX: "-50%",
+          translateY: "-50%"
+        }}
         animate={{
-          x: position.x - 6,
-          y: position.y - 6,
           scale: isClicking ? 0.7 : isHovering ? 2.5 : 1,
-          backgroundColor: isHovering ? "rgba(245, 158, 11, 0.8)" : "rgba(255, 255, 255, 1)", // Amber 500 saat hover
+          backgroundColor: isHovering ? "rgba(245, 158, 11, 0.8)" : "rgba(255, 255, 255, 1)",
         }}
-        transition={{
-          type: "spring",
-          stiffness: 500,
-          damping: 28,
-          mass: 0.5
-        }}
+        transition={{ duration: 0.15 }}
       />
       
       {/* Cincin Luar Transparan */}
       <motion.div
         className="fixed top-0 left-0 w-10 h-10 border border-white/30 rounded-full pointer-events-none z-[9999]"
+        style={{
+          x: outerX,
+          y: outerY,
+          translateX: "-50%",
+          translateY: "-50%"
+        }}
         animate={{
-          x: position.x - 20,
-          y: position.y - 20,
-          scale: isClicking ? 0.9 : isHovering ? 1.5 : 1,
-          opacity: isHovering ? 0 : 1, // Menghilang saat hover untuk fokus ke amber dot
+          scale: isClicking ? 0.8 : isHovering ? 1.5 : 1,
+          opacity: isHovering ? 0 : 1,
         }}
-        transition={{
-          type: "spring",
-          stiffness: 200,
-          damping: 20,
-          mass: 0.8
-        }}
+        transition={{ duration: 0.2 }}
       />
     </>
   );
