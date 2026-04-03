@@ -456,16 +456,31 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
                       damping: 15, 
                       mass: 1 + index * 0.3 // Menciptakan efek serentak yang organik
                     }}
-                    className="absolute inset-0 overflow-hidden rounded-[2rem] border border-white/20 mix-blend-luminosity shadow-2xl origin-center"
+                    className="absolute inset-0 origin-center pointer-events-none"
                   >
-                    <Image
-                      src={item.images.thumbnail}
-                      alt=""
-                      fill
-                      className="object-cover grayscale brightness-75 contrast-125"
-                      sizes="20vw"
-                      quality={30}
-                    />
+                    <motion.div
+                       animate={{ 
+                         y: ["-4%", "4%"],
+                         x: ["-2%", "2%"],
+                         rotate: [-2, 2],
+                       }}
+                       transition={{
+                         duration: 4 + index * 1.5, // varied duration for organic feel
+                         repeat: Infinity,
+                         repeatType: "reverse",
+                         ease: "easeInOut"
+                       }}
+                       className="relative w-full h-full overflow-hidden rounded-[2rem] border border-white/20 mix-blend-luminosity shadow-2xl"
+                    >
+                      <Image
+                        src={item.images.thumbnail}
+                        alt=""
+                        fill
+                        className="object-cover grayscale brightness-75 contrast-125"
+                        sizes="20vw"
+                        quality={30}
+                      />
+                    </motion.div>
                   </motion.div>
                 );
               })}
