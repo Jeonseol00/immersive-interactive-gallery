@@ -186,13 +186,15 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Prepare scattered items relative to the currently active index (Desktop Only)
-  const scatteredItems = useMemo(() => {
-    const list = [...items];
-    const itemHole = list.splice(activeIndex, 1)[0];
-    // Return the active item + 3 subsequent items wrapped around
-    return [itemHole, ...list].slice(0, 4);
-  }, [items, activeIndex]);
+  // Prepare scattered items for Hero background (Desktop Only) — lebih banyak & tersebar penuh layar
+  const heroScatteredItems = useMemo(() => {
+    // Gunakan semua item, loop jika kurang dari 8
+    const result = [];
+    for (let i = 0; i < 8; i++) {
+      result.push(items[i % items.length]);
+    }
+    return result;
+  }, [items]);
 
   useEffect(() => {
     if (prefersReducedMotion || typeof window === "undefined" || isMobile) return;
@@ -218,11 +220,16 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
 
   }, [activeIndex, prefersReducedMotion, isMobile]);
 
-  const scatteredPositions = [
-    "top-[10%] right-[10%] w-[300px] h-[400px] opacity-60",
-    "bottom-[15%] right-[35%] w-[250px] h-[350px] opacity-40",
-    "top-[45%] right-[5%] w-[350px] h-[250px] opacity-70",
-    "top-[20%] right-[45%] w-[200px] h-[200px] opacity-30",
+  // Posisi tersebar full-layar Hero (edge-to-edge)
+  const heroScatteredPositions = [
+    "top-[5%] left-[3%] w-[220px] h-[300px]",
+    "top-[8%] left-[28%] w-[180px] h-[250px]",
+    "top-[3%] right-[28%] w-[200px] h-[280px]",
+    "top-[10%] right-[3%] w-[240px] h-[320px]",
+    "bottom-[8%] left-[5%] w-[200px] h-[270px]",
+    "bottom-[5%] left-[30%] w-[170px] h-[240px]",
+    "bottom-[10%] right-[25%] w-[190px] h-[260px]",
+    "bottom-[6%] right-[2%] w-[210px] h-[290px]",
   ];
 
   const activeItem = items[activeIndex];
@@ -460,54 +467,42 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         />
       </div>
 
-      {/* Desktop Animated Grid Background */}
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-20 motion-safe:animate-flow-grid z-0"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: "40px 40px",
-          backgroundPosition: "0 0"
-        }}
-      />
-      
-      {/* Upgrade 2: Scattered Ambient Background Images Smooth Morphing */}
-      <div className="fixed h-screen inset-x-0 inset-y-0 right-0 w-2/3 ml-auto z-[2] pointer-events-none">
-        <AnimatePresence mode="popLayout">
-          {scatteredItems.map((item, index) => (
+      {/* Grid dihapus — digantikan Living Aurora */}
+
+      {/* ZONA 1: Cinematic Hero Desktop */}
+      <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 overflow-hidden">
+        
+        {/* Hero Scattered Gallery — Edge-to-Edge, Absolute di dalam Hero */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          {heroScatteredItems.map((item, index) => (
             <motion.div
-              layout
-              key={`scatter-${item.id}`} // Gunakan ID saja, biarkan animasi Framer yang membedakan transisi pergerakannya
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.1, transition: { duration: 0.5 } }}
-              transition={{ layout: { type: "spring", stiffness: 100, damping: 20 }, opacity: { duration: 0.8 } }}
+              key={`hero-scatter-${index}`}
+              initial={{ opacity: 0, scale: 0.85, y: 30 }}
+              animate={{ opacity: 0.35, scale: 1, y: 0 }}
+              transition={{ duration: 1.2, delay: 0.1 * index, ease: [0.22, 1, 0.36, 1] }}
               className={cn(
-                "scattered-image absolute overflow-hidden rounded-xl pointer-events-none border border-white/5 opacity-40 mix-blend-luminosity",
-                scatteredPositions[index]
+                "scattered-image absolute overflow-hidden rounded-2xl border border-white/10",
+                heroScatteredPositions[index]
               )}
             >
               <Image
                 src={item.images.thumbnail}
-                alt={item.images.altText}
+                alt=""
                 fill
-                className="object-cover grayscale brightness-75 contrast-125"
-                sizes="33vw"
+                className="object-cover grayscale brightness-50 contrast-110"
+                sizes="20vw"
+                quality={40}
               />
             </motion.div>
           ))}
-        </AnimatePresence>
-      </div>
-
-      {/* ZONA 1: Cinematic Hero Desktop */}
-      <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 border-b border-white/10">
+        </div>
+        
+        {/* Hero Typography */}
         <motion.div 
            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
            transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-           className="flex flex-col items-center text-center mix-blend-screen"
+           className="flex flex-col items-center text-center relative z-20"
         >
           <h1 className="text-[12vw] font-black tracking-tighter text-white drop-shadow-2xl leading-none">IMGAL</h1>
           <p className="text-amber-500 font-bold uppercase tracking-[0.5em] text-sm mt-8">Ruang Digital Mahakarya Abadi</p>
@@ -517,7 +512,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1 }}
-          className="absolute bottom-12 flex flex-col items-center gap-6 group cursor-pointer pointer-events-auto"
+          className="absolute bottom-12 flex flex-col items-center gap-6 group cursor-pointer pointer-events-auto z-20"
           onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
         >
           <span className="text-[10px] font-black text-white/50 uppercase tracking-[0.3em] group-hover:text-amber-400 transition-colors">Jelajahi Koleksi</span>
@@ -525,8 +520,14 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         </motion.button>
       </div>
 
-      {/* ZONA 2: Interactive Gallery Index */}
-      <div className="container mx-auto px-12 relative z-10 flex flex-row min-h-screen gap-16 items-center shrink-0">
+      {/* ZONA 2: Interactive Gallery Index — Scroll-Triggered */}
+      <motion.div 
+        initial={{ opacity: 0, y: 80 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        className="container mx-auto px-12 relative z-10 flex flex-row min-h-screen gap-16 items-center shrink-0"
+      >
         
         {/* Left Side: Interactive Text Index */}
         <div className="w-1/3 flex flex-col shrink-0 gap-8 h-full justify-center">
@@ -606,20 +607,80 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
           </div>
         </div>
 
-      </div>
+      </motion.div>
 
-      {/* ZONA 3: Closing Statement */}
-      <div className="w-full h-[50vh] flex flex-col items-center justify-center relative z-10 bg-black/60 border-t border-white/5 shrink-0 backdrop-blur-md">
-         <h2 className="text-4xl md:text-5xl font-mono tracking-widest uppercase text-neutral-600 mb-8 text-center">Setiap Karya<br/><span className="text-amber-500 font-black">Punya Cerita.</span></h2>
-         <div className="flex gap-4 pointer-events-auto">
-           <Link href="/about" className="px-8 py-4 rounded-full border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-colors">
+      {/* ZONA 3: Closing Statement — Diperkaya */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 1 }}
+        className="w-full py-24 flex flex-col items-center justify-center relative z-10 bg-gradient-to-t from-neutral-950 via-black/90 to-transparent border-t border-white/5 shrink-0"
+      >
+         {/* Decorative Line */}
+         <motion.div 
+           initial={{ scaleX: 0 }}
+           whileInView={{ scaleX: 1 }}
+           viewport={{ once: true }}
+           transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+           className="w-24 h-px bg-amber-500 mb-12 origin-center"
+         />
+
+         <motion.h2 
+           initial={{ opacity: 0, y: 30 }}
+           whileInView={{ opacity: 1, y: 0 }}
+           viewport={{ once: true }}
+           transition={{ duration: 0.8, delay: 0.2 }}
+           className="text-4xl md:text-6xl font-mono tracking-widest uppercase text-neutral-600 mb-4 text-center"
+         >
+           Setiap Karya
+         </motion.h2>
+         <motion.h2 
+           initial={{ opacity: 0, y: 30 }}
+           whileInView={{ opacity: 1, y: 0 }}
+           viewport={{ once: true }}
+           transition={{ duration: 0.8, delay: 0.4 }}
+           className="text-5xl md:text-7xl font-black text-amber-500 tracking-tighter mb-12"
+         >
+           Punya Cerita.
+         </motion.h2>
+
+         <motion.div 
+           initial={{ opacity: 0, y: 20 }}
+           whileInView={{ opacity: 1, y: 0 }}
+           viewport={{ once: true }}
+           transition={{ duration: 0.8, delay: 0.6 }}
+           className="flex gap-4 pointer-events-auto mb-16"
+         >
+           <Link href="/about" className="px-8 py-4 rounded-full border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all duration-300">
               Tentang Kami
            </Link>
-           <Link href="/contact" className="px-8 py-4 rounded-full bg-white text-black text-[10px] font-bold uppercase tracking-[0.2em] hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-transform">
+           <Link href="/contact" className="px-8 py-4 rounded-full bg-white text-black text-[10px] font-bold uppercase tracking-[0.2em] hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-all duration-300">
               Hubungi Kami
            </Link>
-         </div>
-      </div>
+         </motion.div>
+
+         {/* Divider */}
+         <div className="w-full max-w-xl h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-12" />
+
+         {/* Social Links & Credits */}
+         <motion.div 
+           initial={{ opacity: 0 }}
+           whileInView={{ opacity: 1 }}
+           viewport={{ once: true }}
+           transition={{ duration: 0.8, delay: 0.8 }}
+           className="flex flex-col items-center gap-6"
+         >
+           <div className="flex gap-8 pointer-events-auto">
+             <a href="#" className="text-neutral-600 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Instagram</a>
+             <a href="#" className="text-neutral-600 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Behance</a>
+             <a href="#" className="text-neutral-600 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Dribbble</a>
+           </div>
+           <p className="text-neutral-700 text-[10px] font-mono uppercase tracking-widest">
+             &copy; {new Date().getFullYear()} IMGAL — All Rights Reserved
+           </p>
+         </motion.div>
+      </motion.div>
     </section>
   );
 }
