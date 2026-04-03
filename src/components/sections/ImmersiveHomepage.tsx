@@ -133,7 +133,10 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         {/* Upgrade 6: Cinematic Hero Section (Lobi Galeri) */}
         <section className="relative w-full h-[100dvh] flex flex-col items-center justify-center overflow-hidden z-10 bg-transparent">
 
-          <div className="absolute inset-0 w-full h-full pointer-events-none z-[1]">
+          <div 
+             className="absolute inset-0 w-full h-full pointer-events-none z-[1]"
+             style={{ maskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)", WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)" }}
+          >
              {/* THE DROP REVEALER: Focus pull dari atas ke bawah */}
              <motion.div
                 initial={false}
@@ -159,7 +162,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
                  </motion.div>
              </motion.div>
              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-neutral-950/40 mix-blend-multiply" />
-             <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black" />
+             <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-transparent" />
           </div>
           
           <motion.div 
@@ -356,10 +359,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
       {/* Grid dihapus — digantikan Living Aurora */}
 
       {/* ZONA 1: Cinematic Hero Desktop */}
-      <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 overflow-hidden bg-transparent">
-
-        {/* Dynamic Gradient Mask for Text Contrast */}
-        <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_80%)] pointer-events-none" />
+      <div className="relative w-full h-[100vh] flex flex-col items-center justify-center z-10 shrink-0 overflow-visible bg-transparent">
 
         {/* Hero Scattered Gallery — DITENGAH TEKS DAN TOPOGRAFI (z-2) */}
         <div className="absolute inset-0 z-[2] pointer-events-none">
