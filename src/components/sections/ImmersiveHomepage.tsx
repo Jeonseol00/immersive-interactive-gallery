@@ -13,112 +13,6 @@ import { cn } from "@/lib/utils";
 
 const MotionLink = motion.create(Link);
 
-const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "reel" | "done", items: GalleryItemType[] }) => (
-  <motion.div
-    key="intro-overlay-stable"
-    initial={false}
-    animate={{ 
-       y: introState === "done" ? "-100%" : "0%", 
-    }}
-    transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
-    className={cn(
-       "fixed inset-0 z-[9000] bg-black flex flex-col items-center justify-center overflow-hidden",
-       introState === "done" ? "pointer-events-none" : "pointer-events-auto"
-    )}
-  >
-     <AnimatePresence>
-       {introState === "text" && (
-         <motion.div
-           key="intro-text"
-           initial={{ opacity: 0 }}
-           animate={{ opacity: 1 }}
-           exit={{ opacity: 0, scale: 1.1, transition: { duration: 0.4 } }}
-           className="absolute inset-0 flex flex-col items-center justify-center gap-3 lg:gap-4 z-20"
-         >
-           <div className="overflow-hidden px-4 py-2">
-              <motion.h2 
-                 initial={{ opacity: 0, y: 50 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-                 className="text-3xl md:text-5xl font-mono tracking-widest uppercase text-neutral-400"
-              >
-                 Setiap Karya
-              </motion.h2>
-           </div>
-           
-           <div className="overflow-hidden px-4 py-2">
-              <motion.h2 
-                 initial={{ opacity: 0, y: 50 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.6 }}
-                 className="text-5xl md:text-7xl font-black text-amber-500 tracking-tighter"
-              >
-                 Punya Cerita.
-              </motion.h2>
-           </div>
-         </motion.div>
-       )}
-     </AnimatePresence>
-
-     <AnimatePresence>
-       {introState === "reel" && (
-          <motion.div
-             key="intro-reel"
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 0.8 }}
-             exit={{ opacity: 0, transition: { duration: 0.5 } }} // Mengaburkan (fade out) perlahan saat tirai hero terangkat
-             className="absolute flex gap-4 md:gap-8 z-10 w-full h-[150vh] justify-center rotate-[-5deg] scale-110 pointer-events-none"
-          >
-             {/* Pilar 1 - Laju Konstan */}
-             <motion.div 
-               initial={{ y: "100%" }} 
-               animate={{ y: "-100%" }} 
-               transition={{ duration: 2.2, ease: "linear" }}
-               className="flex flex-col gap-4"
-             >
-                {[...items.slice(0, 5), ...items.slice(0, 2)].map((item, i) => (
-                  <div key={`c1-${i}`} className="relative w-32 h-48 md:w-56 md:h-80 rounded-[1.5rem] shadow-2xl brightness-75 sepia-[.2] overflow-hidden border border-white/10 shrink-0">
-                    <Image src={item.images.thumbnail} alt="" fill sizes="25vw" className="object-cover" priority quality={35} />
-                  </div>
-                ))}
-             </motion.div>
-
-             {/* Pilar 2 - Laju Tertinggi & Kedalaman Visual (Parallax Jauh) */}
-             <motion.div 
-               initial={{ y: "150%" }} 
-               animate={{ y: "-150%" }} 
-               transition={{ duration: 2.1, ease: "linear" }}
-               className="flex flex-col gap-4 z-[-1]"
-             >
-                {[...items.slice(3, 8).reverse(), ...items.slice(3, 5)].map((item, i) => (
-                  <div key={`c2-${i}`} className="relative w-32 h-48 md:w-56 md:h-80 rounded-[1.5rem] shadow-2xl brightness-50 sepia-[.4] overflow-hidden border border-white/10 shrink-0">
-                    <Image src={item.images.thumbnail} alt="" fill sizes="25vw" className="object-cover" priority quality={35} />
-                  </div>
-                ))}
-             </motion.div>
-
-             {/* Pilar 3 - Sedang (Dekstop Saja) */}
-             <motion.div 
-               initial={{ y: "80%" }} 
-               animate={{ y: "-100%" }} 
-               transition={{ duration: 2.3, ease: "linear" }}
-               className="flex flex-col gap-4 hidden md:flex"
-             >
-                {[...items.slice(6, 9), ...items.slice(0, 4)].map((item, i) => (
-                  <div key={`c3-${i}`} className="relative w-32 h-48 md:w-56 md:h-80 rounded-[1.5rem] shadow-2xl brightness-75 sepia-[.2] overflow-hidden border border-white/10 shrink-0">
-                    <Image src={item.images.thumbnail} alt="" fill sizes="25vw" className="object-cover" priority quality={35} />
-                  </div>
-                ))}
-             </motion.div>
-             
-             {/* Masking Gradient agar gambar tidak merobek tepi layar seketika */}
-             <div className="absolute inset-x-0 top-0 h-[25vh] bg-gradient-to-b from-black to-transparent z-20 pointer-events-none" />
-             <div className="absolute inset-x-0 bottom-0 h-[25vh] bg-gradient-to-t from-black to-transparent z-20 pointer-events-none" />
-          </motion.div>
-       )}
-     </AnimatePresence>
-  </motion.div>
-);
 
 interface ImmersiveHomepageProps {
   items: GalleryItemType[];
@@ -130,72 +24,6 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
   const prefersReducedMotion = useReducedMotion();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(true);
-  const [introState, setIntroState] = useState<"blank" | "text" | "reel" | "done">("blank");
-
-  useEffect(() => {
-    // Intro Sequence Logic (Teks & Rapid Reel)
-    // Menggunakan Polling yang 100% presisi memastikan intro ini HANYA jalan SETELAH Preloader usai
-    let reelTimer: NodeJS.Timeout;
-    let doneTimer: NodeJS.Timeout;
-    let seqWaitTimer: NodeJS.Timeout;
-    let pollInterval: NodeJS.Timeout;
-
-    // Reset nama sesi agar pengguna bisa melihat perbaruannya tanpa manual hapus cache
-    const hasSeenIntro = sessionStorage.getItem('hasSeenEpicIntro_v4');
-    if (hasSeenIntro) {
-      setIntroState("done");
-      return;
-    }
-
-    const startIntroSequence = () => {
-      setIntroState("text");
-      try {
-        sessionStorage.setItem('hasSeenEpicIntro_v4', 'true');
-      } catch (e) {
-        console.warn("Storage restricted", e);
-      }
-      
-      // Tahap 1: Teks 'Setiap Karya Punya Cerita' dipasang selama 3 Detik
-      reelTimer = setTimeout(() => {
-        setIntroState("reel");
-      }, 3000);
-
-      // Tahap 2: Air terjun gambar (Rapid Reel) berjalan selama 2 Detik
-      doneTimer = setTimeout(() => {
-        setIntroState("done");
-      }, 5000); 
-    };
-
-    const checkPreloader = () => {
-       try {
-         if (sessionStorage.getItem("preloader_done")) {
-             clearInterval(pollInterval);
-             seqWaitTimer = setTimeout(startIntroSequence, 1200); 
-         }
-       } catch (e) {
-         clearInterval(pollInterval);
-         seqWaitTimer = setTimeout(startIntroSequence, 3500); 
-       }
-    };
-
-    // Sinkronisasi via Listener yang lebih aman tanpa overhead Interval
-    const handlePreloaderDoneEvent = () => {
-       clearInterval(pollInterval);
-       seqWaitTimer = setTimeout(startIntroSequence, 1200);
-    };
-    window.addEventListener("preloader_finished", handlePreloaderDoneEvent);
-
-    // Poll fallback setiap 100ms
-    pollInterval = setInterval(checkPreloader, 100);
-
-    return () => {
-      clearTimeout(reelTimer);
-      clearTimeout(doneTimer);
-      clearTimeout(seqWaitTimer);
-      clearInterval(pollInterval);
-      window.removeEventListener("preloader_finished", handlePreloaderDoneEvent);
-    };
-  }, []);
 
   // Upgrade: Generate unique categories for mobile pill navigation
   const categories = useMemo(() => {
@@ -275,12 +103,8 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
 
   const activeItem = items[activeIndex];
 
-  // Global Intro Overlay rendered for BOTH Mobile and Desktop
-  const introComponent = <IntroOverlay introState={introState} items={items} />;
-
   return (
     <>
-      {introComponent}
       {isMobile ? (
         <main className="w-full flex flex-col items-center justify-start bg-black min-h-screen relative">
           
@@ -309,7 +133,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
              {/* THE DROP REVEALER: Focus pull dari atas ke bawah */}
              <motion.div
                 initial={false}
-                animate={introState === "done" ? { y: "0%", scale: 1, filter: "blur(0px)" } : { y: "-15%", scale: 1.1, filter: "blur(15px)" }}
+                animate={{ y: "0%", scale: 1, filter: "blur(0px)" }}
                 transition={{ duration: 1.5, ease: [0.76, 0, 0.24, 1] }} // Tersinkron dengan Curtain rise
                 className="w-full h-full absolute inset-0"
              >
@@ -346,7 +170,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
 
           <motion.div 
             initial={false}
-            animate={introState === "done" ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="absolute bottom-16 z-20 flex flex-col items-center gap-3"
           >
