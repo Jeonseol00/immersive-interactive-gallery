@@ -23,30 +23,23 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
     transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
     className={cn(
        "fixed inset-0 z-[9000] bg-black flex flex-col items-center justify-center overflow-hidden",
-       introState === "done" ? "pointer-events-none" : "pointer-events-auto",
-       introState === "blank" ? "opacity-0" : "opacity-100"
+       introState === "done" ? "pointer-events-none" : "pointer-events-auto"
     )}
   >
      <AnimatePresence>
        {introState === "text" && (
          <motion.div
            key="intro-text"
-           initial="hidden"
-           animate="visible"
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
            exit={{ opacity: 0, scale: 1.1, filter: "blur(15px)", transition: { duration: 0.4 } }}
-           variants={{
-             hidden: { opacity: 0 },
-             visible: { opacity: 1, transition: { staggerChildren: 0.6, delayChildren: 0.2 } }
-           }}
            className="absolute inset-0 flex flex-col items-center justify-center gap-3 lg:gap-4 z-20"
          >
            <div className="overflow-hidden px-4 py-2">
               <motion.h2 
-                 variants={{
-                   hidden: { filter: "blur(12px)", opacity: 0, y: 30, scale: 0.95 },
-                   visible: { filter: "blur(0px)", opacity: 1, y: 0, scale: 1 }
-                 }}
-                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                 initial={{ filter: "blur(12px)", opacity: 0, y: 30, scale: 0.95 }}
+                 animate={{ filter: "blur(0px)", opacity: 1, y: 0, scale: 1 }}
+                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
                  className="text-3xl md:text-5xl font-mono tracking-widest uppercase text-neutral-400"
               >
                  Setiap Karya
@@ -55,11 +48,9 @@ const IntroOverlay = ({ introState, items }: { introState: "blank" | "text" | "r
            
            <div className="overflow-hidden px-4 py-2">
               <motion.h2 
-                 variants={{
-                   hidden: { filter: "blur(15px)", opacity: 0, y: 40, scale: 0.9 },
-                   visible: { filter: "blur(0px)", opacity: 1, y: 0, scale: 1 }
-                 }}
-                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                 initial={{ filter: "blur(15px)", opacity: 0, y: 40, scale: 0.9 }}
+                 animate={{ filter: "blur(0px)", opacity: 1, y: 0, scale: 1 }}
+                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.8 }}
                  className="text-5xl md:text-7xl font-black text-amber-500 tracking-tighter"
               >
                  Punya Cerita.
