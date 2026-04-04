@@ -68,11 +68,6 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     return result;
   }, [items]);
 
-  // Prepare STATIC ambient items for Zone 2 background (Desktop Only) — NOT reactive to hover
-  const zone2AmbientItems = useMemo(() => {
-    return items.slice(0, 4);
-  }, [items]);
-
   // Showcased items for the curated list (6 items)
   const showcaseItems = useMemo(() => items.slice(0, 6), [items]);
   const activeItem = showcaseItems[activeIndex] || items[0];
@@ -383,33 +378,56 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         {/* Right Side: Vast Central Focal Image & Zone 2 Scattered Ambient */}
         <div className="flex-1 flex flex-col justify-center items-center relative h-full pointer-events-none">
           
-          {/* Static Ambient Background Cards — NOT reactive to hover for maximum performance */}
+          {/* Persistent DOM Slot Architecture — Animasi Shuffle Super Ringan (0 Unmounts) */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl aspect-[3/2] pointer-events-none z-0">
-              {zone2AmbientItems.map((item, index) => {
+              {showcaseItems.map((item, index) => {
+                let slotIndex = -1;
+                if (index === activeIndex) {
+                  slotIndex = 0;
+                } else {
+                  let listIndex = index;
+                  if (index > activeIndex) {
+                    listIndex = index - 1;
+                  }
+                  if (listIndex < 3) {
+                    slotIndex = listIndex + 1;
+                  }
+                }
+
                 const transforms = [
-                  { rotate: 6, x: "25%", y: "-15%", scale: 0.9, opacity: 0.4 },
-                  { rotate: -8, x: "-30%", y: "20%", scale: 0.8, opacity: 0.25 },
-                  { rotate: -12, x: "-40%", y: "-10%", scale: 0.7, opacity: 0.18 },
-                  { rotate: 15, x: "35%", y: "25%", scale: 0.6, opacity: 0.12 },
+                  { rotate: 6, x: "25%", y: "-15%", scale: 0.9, opacity: 0.5 },
+                  { rotate: -8, x: "-30%", y: "20%", scale: 0.8, opacity: 0.35 },
+                  { rotate: -12, x: "-40%", y: "-10%", scale: 0.7, opacity: 0.25 },
+                  { rotate: 15, x: "35%", y: "25%", scale: 0.6, opacity: 0.15 },
                 ];
-                const prop = transforms[index];
+                
+                const isVisible = slotIndex !== -1;
+                const prop = isVisible ? transforms[slotIndex] : { rotate: 0, x: "50%", y: "150%", scale: 0.4, opacity: 0 };
+                const zIndex = isVisible ? 4 - slotIndex : 0;
 
                 return (
                   <motion.div
-                    key={`zone2-ambient-${item.id}`}
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    whileInView={{ opacity: prop.opacity, scale: prop.scale }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1.2, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute inset-0 origin-center pointer-events-none"
-                    style={{
-                      transform: `rotate(${prop.rotate}deg) translate(${prop.x}, ${prop.y})`,
-                      zIndex: 4 - index,
+                    key={`zone2-persistent-card-${item.id}`}
+                    initial={false}
+                    animate={{ 
+                      opacity: prop.opacity, 
+                      scale: prop.scale, 
+                      rotate: prop.rotate, 
+                      x: prop.x, 
+                      y: prop.y,
+                      zIndex: zIndex
                     }}
+                    transition={{ type: "spring", stiffness: 80, damping: 15, mass: 1 + (isVisible ? slotIndex * 0.2 : 0) }}
+                    className="absolute inset-0 origin-center pointer-events-none"
+                    style={{ willChange: "transform, opacity" }}
                   >
                     <motion.div
-                       animate={{ y: ["-3%", "3%"], rotate: [-1, 1] }}
-                       transition={{ duration: 5 + index * 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+                       animate={{ 
+                         y: ["-4%", "4%"],
+                         x: ["-2%", "2%"],
+                         rotate: [-2, 2],
+                       }}
+                       transition={{ duration: 4 + index * 0.5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
                        className="relative w-full h-full overflow-hidden rounded-[2rem] border border-white/20 mix-blend-luminosity shadow-2xl"
                        style={{ willChange: "transform" }}
                     >
