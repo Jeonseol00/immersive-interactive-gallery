@@ -111,7 +111,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         {/* Upgrade 3: Scroll Progress Indicator */}
         <motion.div
           className="fixed top-16 md:top-20 left-0 right-0 h-[3px] bg-amber-500 origin-left z-50 shadow-[0_0_12px_rgba(245,158,11,0.6)]"
-          style={{ scaleX }}
+          style={{ scaleX, willChange: "transform" }}
         />
 
         {/* Upgrade 6: Cinematic Hero Section (Lobi Galeri) */}
@@ -124,9 +124,10 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
              {/* THE DROP REVEALER: Focus pull dari atas ke bawah */}
              <motion.div
                 initial={false}
-                animate={{ y: "0%", scale: 1, filter: "blur(0px)" }}
+                animate={{ y: "0%", scale: 1 }}
                 transition={{ duration: 1.5, ease: [0.76, 0, 0.24, 1] }} // Tersinkron dengan Curtain rise
                 className="w-full h-full absolute inset-0"
+                style={{ willChange: "transform" }}
              >
                  {/* THE ENDLESS BREATH: Ken burns berjalan paralel di dalamnya */}
                  <motion.div 
@@ -296,10 +297,11 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
 
         {/* Hero Typography — PALING DEPAN (Z-20) SESUAI TATA LETAK ZONA 1 PADA UMUMNYA */}
         <motion.div 
-           initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
-           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+           initial={{ opacity: 0, y: 50 }}
+           animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
            className="flex flex-col items-center text-center relative z-20 pointer-events-none"
+           style={{ willChange: "transform, opacity" }}
         >
           <h1 className="text-[12vw] font-black tracking-tighter text-white drop-shadow-2xl leading-none">IMGAL</h1>
           <p className="text-amber-500 font-bold uppercase tracking-[0.5em] text-sm mt-8">Ruang Digital Mahakarya Abadi</p>
@@ -391,6 +393,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
                       mass: 1 + index * 0.3 // Menciptakan efek serentak yang organik
                     }}
                     className="absolute inset-0 origin-center pointer-events-none"
+                    style={{ willChange: "transform, opacity" }}
                   >
                     <motion.div
                        animate={{ 
@@ -405,6 +408,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
                          ease: "easeInOut"
                        }}
                        className="relative w-full h-full overflow-hidden rounded-[2rem] border border-white/20 mix-blend-luminosity shadow-2xl"
+                       style={{ willChange: "transform" }}
                     >
                       <Image
                         src={item.images.thumbnail}
@@ -426,11 +430,12 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={`desktop-focal-${activeItem.id}`}
-                initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, scale: 1.05, filter: "blur(10px)", zIndex: 10 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05, zIndex: 10 }}
                 transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute inset-0 w-full h-full pointer-events-auto"
+                style={{ willChange: "transform, opacity" }}
               >
                 <Link 
                   href={`/gallery/${activeItem.slug}`} 

@@ -62,8 +62,9 @@ export default function AboutClient() {
         
         <div className="relative z-10 flex flex-col items-center text-center px-6">
           <motion.div 
-            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ willChange: "transform, opacity" }}
             transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
             className="overflow-hidden"
           >
@@ -144,8 +145,9 @@ export default function AboutClient() {
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            style={{ willChange: "transform, opacity" }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1.2 }}
             className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden border border-white/10 mt-4 group"

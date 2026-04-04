@@ -15,7 +15,7 @@ export function ScrollProgress() {
   return (
     <motion.div
       className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-600 via-amber-400 to-amber-200 origin-left z-[9000]"
-      style={{ scaleX }}
+      style={{ scaleX, willChange: "transform" }}
     />
   );
 }

@@ -70,11 +70,12 @@ export function Navbar() {
                 <motion.div
                   key={i}
                   variants={{
-                    open: { opacity: 1, y: 0, filter: "blur(0px)" },
-                    closed: { opacity: 0, y: 30, filter: "blur(10px)" }
+                    open: { opacity: 1, y: 0 },
+                    closed: { opacity: 0, y: 30 }
                   }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className="border-b border-white/10 last:border-0"
+                  style={{ willChange: "transform, opacity" }}
                 >
                   <Link 
                     href={link.href}

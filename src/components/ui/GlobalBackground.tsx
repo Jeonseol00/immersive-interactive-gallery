@@ -26,7 +26,8 @@ export function GlobalBackground() {
            transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
            className="absolute -inset-[100%] w-[300%] h-[300%] origin-[45%_55%] opacity-60"
            style={{ 
-             backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 35px, rgba(245, 158, 11, 0.25) 35px, rgba(245, 158, 11, 0.25) 36px)`
+             backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 35px, rgba(245, 158, 11, 0.25) 35px, rgba(245, 158, 11, 0.25) 36px)`,
+             willChange: "transform"
            }}
         />
         <motion.div
@@ -34,7 +35,8 @@ export function GlobalBackground() {
            transition={{ duration: 140, repeat: Infinity, ease: "linear" }}
            className="absolute -inset-[100%] w-[300%] h-[300%] origin-[55%_45%] opacity-60"
            style={{ 
-             backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 38px, rgba(245, 158, 11, 0.15) 38px, rgba(245, 158, 11, 0.15) 39px)`
+             backgroundImage: `repeating-radial-gradient(ellipse at center, transparent 0, transparent 38px, rgba(245, 158, 11, 0.15) 38px, rgba(245, 158, 11, 0.15) 39px)`,
+             willChange: "transform"
            }}
         />
 
@@ -49,7 +51,7 @@ export function GlobalBackground() {
             <motion.div
               key={`global-dust-${i}`}
               className="absolute bg-white rounded-full mix-blend-screen opacity-40 z-20"
-              style={{ width: size, height: size, left: `${left}%`, top: "110%" }}
+              style={{ width: size, height: size, left: `${left}%`, top: "110%", willChange: "transform" }}
               animate={{ y: ["0vh", "-120vh"], x: [0, (Math.random() - 0.5) * 60] }}
               transition={{ duration: Math.random() * 20 + 20, repeat: Infinity, ease: "linear", delay: -(Math.random() * 40) }}
             />
@@ -65,6 +67,7 @@ export function GlobalBackground() {
           }}
           transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
           className="absolute -top-[15%] -left-[5%] w-[65vw] md:w-[55vw] h-[65vw] md:h-[55vw] rounded-full bg-amber-800/40 blur-[100px] z-20"
+          style={{ willChange: "transform" }}
         />
         {/* Orb 2: Cyan Dingin (Kanan-Bawah) */}
         <motion.div 
@@ -75,6 +78,7 @@ export function GlobalBackground() {
           }}
           transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
           className="absolute -bottom-[15%] -right-[5%] w-[65vw] md:w-[55vw] h-[65vw] md:h-[55vw] rounded-full bg-cyan-800/25 blur-[100px] z-20"
+          style={{ willChange: "transform" }}
         />
         {/* Orb 3: Rose Hangat (Tengah) */}
         <motion.div 
@@ -85,6 +89,7 @@ export function GlobalBackground() {
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           className="absolute top-[30%] left-[25%] w-[50vw] md:w-[40vw] h-[50vw] md:h-[40vw] rounded-full bg-rose-900/15 blur-[120px] z-20"
+          style={{ willChange: "transform" }}
         />
       </div>
     </>
