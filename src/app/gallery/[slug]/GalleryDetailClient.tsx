@@ -6,6 +6,7 @@ import Image from "next/image";
 import { HoverAccordion } from "@/components/ui/HoverAccordion";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { mockGalleryData } from "@/lib/data";
 
 export function GalleryDetailClient({ item }: { item: GalleryItem }) {
   const MotionImage = motion.create(Image);
@@ -64,22 +65,52 @@ export function GalleryDetailClient({ item }: { item: GalleryItem }) {
               items={[
                 {
                   id: "1",
-                  title: "Manifesto",
+                  title: "Narasi & Visi",
                   description: item.interactions.accordionDescription
                 },
                 {
                   id: "2",
-                  title: "Filosofi Desain",
-                  description: "Sebuah perjalanan visual menggabungkan tata letak dinamis dan warna kontras untuk menciptakan pengalaman sensorik total."
+                  title: "Detail Teknis Lensa",
+                  description: `Diambil dengan mempertimbangkan komposisi visual kelas tinggi. Karya ini memprioritaskan asimetri rasio ${item.images.dimensions.aspectRatio} untuk membangkitkan dimensi spasial.`
                 },
                 {
                   id: "3",
-                  title: "Teknik Visual",
-                  description: "Rendered using advanced WebGL principles mapping standard JSON properties to GPU buffers with GSAP hijacking."
+                  title: "Metadata Render",
+                  description: `Karya di-publish oleh ${item.metadata.author}. Menggunakan sinkronisasi parallax sebesar ${item.interactions.parallaxSpeed}x untuk menciptakan kedalaman semu di ruang eksibisi Zone 2.`
                 }
               ]}
             />
           </main>
+
+          {/* Related Works Dibuat Dinamis (MockUp) */}
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+            className="mt-20 pt-16 border-t border-white/10"
+          >
+            <div className="flex justify-between items-end mb-8">
+               <h3 className="text-2xl md:text-4xl font-black">Karya Serupa</h3>
+               <Link href="/" className="text-[10px] uppercase font-bold tracking-widest text-amber-500 hover:text-white transition-colors">Lihat Semua</Link>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {mockGalleryData
+                .filter(g => g.id !== item.id)
+                .slice(0, 2)
+                .map((related, i) => (
+                  <Link key={related.id} href={`/gallery/${related.slug}`} className="group relative aspect-[4/3] rounded-2xl overflow-hidden block">
+                     <Image src={related.images.thumbnail} alt="" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <span className="text-[10px] text-amber-500 font-bold uppercase tracking-widest mb-1">{related.category}</span>
+                        <h4 className="text-xl font-bold text-white">{related.title}</h4>
+                     </div>
+                  </Link>
+              ))}
+            </div>
+          </motion.div>
+
         </div>
       </div>
     </div>

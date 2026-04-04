@@ -7,6 +7,7 @@ import { CustomCursor } from "@/components/ui/CustomCursor";
 import { Preloader } from "@/components/ui/Preloader";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { GlobalBackground } from "@/components/ui/GlobalBackground";
+import { Footer } from "@/components/layout/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,9 +42,10 @@ export default function RootLayout({
         
         <SmoothScrollWrapper>
           <Navbar />
-          <main className="flex-1 mt-16 md:mt-20">
+          <main className="flex-1 mt-16 md:mt-20 z-10 relative">
             {children}
           </main>
+          <Footer />
         </SmoothScrollWrapper>
       </body>
     </html>

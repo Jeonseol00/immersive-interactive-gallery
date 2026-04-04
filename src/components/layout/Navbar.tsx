@@ -23,9 +23,9 @@ export function Navbar() {
         <Link href="/about" className="hover:text-amber-400 transition-colors">
           Tentang Kami
         </Link>
-        <button className="px-5 py-2.5 bg-white text-black rounded-full font-semibold hover:bg-neutral-200 transition-colors">
+        <Link href="/contact" className="px-5 py-2.5 bg-white text-black rounded-full font-semibold hover:bg-neutral-200 transition-colors">
           Hubungi
-        </button>
+        </Link>
       </nav>
 
       {/* Mobile Hamburger (Min height 48px for a11y) */}
