@@ -24,13 +24,6 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
   return (
     <>
     <section className="relative w-full z-10 flex flex-col pt-0 pb-0 overflow-hidden">
-      
-      {/* Scroll Progress Indicator Inline */}
-      <motion.div
-        className="fixed top-16 md:top-20 left-0 right-0 h-[3px] bg-amber-500 origin-left z-50 shadow-[0_0_12px_rgba(245,158,11,0.6)]"
-        style={{ scaleX, willChange: "transform" }}
-      />
-
       <HeroZone items={items} />
       
       <GalleryFeedZone 

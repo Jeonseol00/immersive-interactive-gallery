@@ -42,7 +42,7 @@ export default function RootLayout({
         
         <SmoothScrollWrapper>
           <Navbar />
-          <main className="flex-1 mt-16 md:mt-20 z-10 relative">
+          <main className="flex-1 w-full relative z-10">
             {children}
           </main>
           <Footer />
