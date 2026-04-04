@@ -202,7 +202,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
           </div>
 
           <div className="container mx-auto px-6 pb-20 w-full max-w-2xl flex flex-col gap-16 sm:gap-20 relative z-10">
-          {items.map((item, idx) => (
+          {items.slice(0, 6).map((item, idx) => (
             <motion.div 
               key={`mobile-feed-${item.id}`} 
               id={`feed-category-${item.category.toLowerCase().replace(/\s+/g, '-')}`}
@@ -250,7 +250,17 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
               </div>
             </motion.div>
           ))}
+          
+          <div className="flex justify-center w-full mt-4 pb-12">
+            <Link 
+              href="/gallery" 
+              className="px-8 py-4 bg-white/5 border border-white/10 rounded-full font-bold text-xs tracking-widest uppercase text-white shadow-xl hover:bg-amber-500 hover:text-black hover:border-transparent transition-all block w-fit text-center"
+            >
+              Lihat Semua Koleksi Arsip →
+            </Link>
           </div>
+          </div>
+
         </div>
         </main>
       ) : (
@@ -325,12 +335,12 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         {/* Left Side: Interactive Text Index */}
         <div className="w-1/3 flex flex-col shrink-0 gap-8 h-full justify-center">
           <div className="flex justify-between items-center text-xs tracking-widest text-neutral-500 font-mono uppercase border-b border-white/10 pb-4 mb-4">
-            <span>Works / Mirage</span>
+            <span>Works / Showcase</span>
             <span>Hover & Click</span>
           </div>
 
-          <div className="flex flex-col gap-1 max-h-[60vh] overflow-y-auto no-scrollbar pointer-events-auto">
-            {items.map((item, idx) => {
+          <div className="flex flex-col gap-1 pointer-events-auto border-b border-white/10 pb-6 mb-2">
+            {items.slice(0, 6).map((item, idx) => {
               const isActive = activeIndex === idx;
               return (
                 <button
@@ -349,6 +359,10 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
               );
             })}
           </div>
+          
+          <Link href="/gallery" className="text-[10px] sm:text-xs font-bold text-neutral-400 hover:text-amber-400 uppercase tracking-[0.2em] transition-colors flex items-center gap-2 pointer-events-auto w-fit">
+            Eksplorasi Seluruh {items.length} Arsip <span className="text-amber-500 text-lg">→</span>
+          </Link>
         </div>
 
         {/* Right Side: Vast Central Focal Image & Zone 2 Scattered Ambient */}
