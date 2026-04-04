@@ -1,7 +1,9 @@
 import { CampaignClient } from "./CampaignClient";
 
-export const metadata = {
-  title: "Kampanye | Immersive Interactive Gallery",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Kampanye Eksibisi | IMGAL",
   description: "Jelajahi pameran eksklusif dan inisiatif seni kolaboratif kami.",
 };
 

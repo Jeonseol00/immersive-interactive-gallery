@@ -20,8 +20,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Immersive Interactive Gallery",
-  description: "A high-performance interactive gallery experience",
+  title: {
+    template: "%s | IMGAL",
+    default: "IMGAL | Interactive Digital Gallery",
+  },
+  description: "Ruang eksperimental interaktif dimana mahakarya seni klasik dibangun ulang menggunakan komputasi digital terkini.",
+  openGraph: {
+    title: "IMGAL | Interactive Digital Gallery",
+    description: "Ruang eksperimental interaktif dimana mahakarya seni klasik dibangun ulang menggunakan komputasi digital.",
+    url: "https://imgal.studio",
+    siteName: "IMGAL Desktop Gallery",
+    images: [{ url: "/images/birmingham-museums-trust-sJr8LDyEf7k-unsplash.jpg", width: 1200, height: 630 }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "IMGAL | Interactive Digital Gallery",
+    description: "Ruang eksperimental dimana mahakarya seni klasik dibangun ulang.",
+    images: ["/images/birmingham-museums-trust-sJr8LDyEf7k-unsplash.jpg"],
+  }
 };
 
 export default function RootLayout({

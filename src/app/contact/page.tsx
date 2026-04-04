@@ -1,7 +1,9 @@
 import { ContactClient } from "./ContactClient";
 
-export const metadata = {
-  title: "Hubungi Kami | Immersive Interactive Gallery",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Hubungi Kami | IMGAL",
   description: "Mari berkolaborasi dan wujudkan pameran spektakuler.",
 };
 

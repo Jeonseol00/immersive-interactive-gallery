@@ -1,7 +1,9 @@
 import AboutClient from "./AboutClient";
 
-export const metadata = {
-  title: "Tentang Kami | Immersive Interactive Gallery",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Tentang Kami | IMGAL",
   description: "Sebuah manifesto digital untuk perayaan mahakarya klasik dalam dunia web interaktif modern.",
 };
 

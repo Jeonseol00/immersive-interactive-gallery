@@ -17,7 +17,7 @@ export function Navbar() {
 
       {/* Desktop Menu */}
       <nav className="hidden md:flex gap-8 text-sm font-medium tracking-wide items-center">
-        <Link href="/" className="hover:text-amber-400 transition-colors">
+        <Link href="/gallery" className="hover:text-amber-400 transition-colors">
           Galeri
         </Link>
         <Link href="/about" className="hover:text-amber-400 transition-colors">
@@ -62,7 +62,7 @@ export function Navbar() {
               className="flex flex-col w-full flex-grow mt-4"
             >
               {[
-                { label: "Galeri", href: "/", subtitle: "Eksplorasi Mahakarya" },
+                { label: "Galeri", href: "/gallery", subtitle: "Eksplorasi Mahakarya" },
                 { label: "Kampanye", href: "/campaigns", subtitle: "Acara & Pameran" },
                 { label: "Tentang Kami", href: "/about", subtitle: "Cerita di Balik Galeri" },
                 { label: "Hubungi", href: "/contact", subtitle: "Bekerja Sama" }
