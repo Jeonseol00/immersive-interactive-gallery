@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import gsap from "gsap";
@@ -21,9 +21,21 @@ interface ImmersiveHomepageProps {
 export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(true);
+
+  // Debounced hover handler — prevents rapid re-renders when cursor sweeps across list
+  const handleHover = useCallback((idx: number) => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => setActiveIndex(idx), 120);
+  }, []);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => { if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current); };
+  }, []);
 
   // Upgrade: Generate unique categories for mobile pill navigation
   const categories = useMemo(() => {
@@ -56,12 +68,14 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     return result;
   }, [items]);
 
-  // Prepare scattered items for Zone 2 Card Shuffle (Desktop Only) — dinamis berdasarkan activeIndex
-  const zone2ScatteredItems = useMemo(() => {
-    const list = [...items];
-    const itemHole = list.splice(activeIndex, 1)[0];
-    return [itemHole, ...list].slice(0, 4);
-  }, [items, activeIndex]);
+  // Prepare STATIC ambient items for Zone 2 background (Desktop Only) — NOT reactive to hover
+  const zone2AmbientItems = useMemo(() => {
+    return items.slice(0, 4);
+  }, [items]);
+
+  // Showcased items for the curated list (6 items)
+  const showcaseItems = useMemo(() => items.slice(0, 6), [items]);
+  const activeItem = showcaseItems[activeIndex] || items[0];
 
   useEffect(() => {
     if (prefersReducedMotion || typeof window === "undefined" || isMobile) return;
@@ -101,7 +115,8 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
 
 
 
-  const activeItem = items[activeIndex];
+
+
 
   return (
     <>
@@ -345,7 +360,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
               return (
                 <button
                   key={`index-${item.id}`}
-                  onMouseEnter={() => setActiveIndex(idx)}
+                  onMouseEnter={() => handleHover(idx)}
                   onClick={() => router.push(`/gallery/${item.slug}`)}
                   className={cn(
                     "text-left py-2 text-2xl lg:text-3xl font-black uppercase transition-all duration-300 w-full truncate tracking-tighter hover:cursor-pointer",
@@ -368,53 +383,33 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
         {/* Right Side: Vast Central Focal Image & Zone 2 Scattered Ambient */}
         <div className="flex-1 flex flex-col justify-center items-center relative h-full pointer-events-none">
           
-          {/* Scattered Ambient Card Shuffle (Professional Dealing Cards Effect) */}
+          {/* Static Ambient Background Cards — NOT reactive to hover for maximum performance */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl aspect-[3/2] pointer-events-none z-0">
-            <AnimatePresence>
-              {zone2ScatteredItems.map((item, index) => {
-                // Konfigurasi posisi untuk masing-masing urutan kartu (3D Parallax Shuffle)
+              {zone2AmbientItems.map((item, index) => {
                 const transforms = [
-                  { rotate: 6, x: "25%", y: "-15%", scale: 0.9, opacity: 0.5, zIndex: 4 },
-                  { rotate: -8, x: "-30%", y: "20%", scale: 0.8, opacity: 0.35, zIndex: 3 },
-                  { rotate: -12, x: "-40%", y: "-10%", scale: 0.7, opacity: 0.25, zIndex: 2 },
-                  { rotate: 15, x: "35%", y: "25%", scale: 0.6, opacity: 0.15, zIndex: 1 },
+                  { rotate: 6, x: "25%", y: "-15%", scale: 0.9, opacity: 0.4 },
+                  { rotate: -8, x: "-30%", y: "20%", scale: 0.8, opacity: 0.25 },
+                  { rotate: -12, x: "-40%", y: "-10%", scale: 0.7, opacity: 0.18 },
+                  { rotate: 15, x: "35%", y: "25%", scale: 0.6, opacity: 0.12 },
                 ];
                 const prop = transforms[index];
 
                 return (
                   <motion.div
-                    key={`zone2-scatter-${item.id}`}
-                    initial={{ opacity: 0, scale: 0.3, y: 150 }}
-                    animate={{ 
-                      opacity: prop.opacity, 
-                      scale: prop.scale, 
-                      rotate: prop.rotate, 
-                      x: prop.x, 
-                      y: prop.y,
-                      zIndex: prop.zIndex
-                    }}
-                    exit={{ opacity: 0, scale: 0.4, y: 150, x: "50%", rotate: prop.rotate * 2 }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 80, 
-                      damping: 15, 
-                      mass: 1 + index * 0.3 // Menciptakan efek serentak yang organik
-                    }}
+                    key={`zone2-ambient-${item.id}`}
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    whileInView={{ opacity: prop.opacity, scale: prop.scale }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.2, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
                     className="absolute inset-0 origin-center pointer-events-none"
-                    style={{ willChange: "transform, opacity" }}
+                    style={{
+                      transform: `rotate(${prop.rotate}deg) translate(${prop.x}, ${prop.y})`,
+                      zIndex: 4 - index,
+                    }}
                   >
                     <motion.div
-                       animate={{ 
-                         y: ["-4%", "4%"],
-                         x: ["-2%", "2%"],
-                         rotate: [-2, 2],
-                       }}
-                       transition={{
-                         duration: 4 + index * 1.5, // varied duration for organic feel
-                         repeat: Infinity,
-                         repeatType: "reverse",
-                         ease: "easeInOut"
-                       }}
+                       animate={{ y: ["-3%", "3%"], rotate: [-1, 1] }}
+                       transition={{ duration: 5 + index * 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
                        className="relative w-full h-full overflow-hidden rounded-[2rem] border border-white/20 mix-blend-luminosity shadow-2xl"
                        style={{ willChange: "transform" }}
                     >
@@ -430,26 +425,31 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
                   </motion.div>
                 );
               })}
-            </AnimatePresence>
           </div>
 
-          {/* Upgrade 1: Crossfade Focal Image — Proporsi Diperkecil */}
+          {/* Preload all showcase images for instant crossfade */}
+          <div className="hidden">
+            {showcaseItems.map((item) => (
+              <Image key={`preload-${item.id}`} src={item.images.fullResolution} alt="" width={10} height={10} quality={30} />
+            ))}
+          </div>
+
+          {/* Focal Image — Lightweight crossfade using CSS transition instead of AnimatePresence */}
           <div className="relative w-full max-w-xl aspect-[3/2] mb-8 z-10">
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={`desktop-focal-${activeItem.id}`}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05, zIndex: 10 }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="absolute inset-0 w-full h-full pointer-events-auto"
-                style={{ willChange: "transform, opacity" }}
               >
                 <Link 
                   href={`/gallery/${activeItem.slug}`} 
                   className="group relative w-full h-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 block cursor-pointer transition-transform duration-500 hover:scale-[1.02]"
                 >
-                   <motion.div layoutId={`gallery-image-${activeItem.id}`} className="w-full h-full relative">
+                   <div className="w-full h-full relative">
                     <Image 
                       src={activeItem.images.fullResolution} 
                       alt={activeItem.title} 
@@ -458,12 +458,12 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
                       priority
                       sizes="50vw"
                     />
-                   </motion.div>
+                   </div>
 
-                   {/* Hover Discover Overlay Internal */}
+                   {/* Hover Discover Overlay */}
                    <div className="absolute inset-0 bg-neutral-950/10 mix-blend-overlay pointer-events-none group-hover:bg-neutral-950/70 transition-colors duration-700"></div>
                    
-                   {/* Metadata Muncul Saat Hover (Zone 2) */}
+                   {/* Metadata Overlay */}
                    <div className="absolute inset-0 p-10 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                       <div className="translate-y-8 group-hover:translate-y-0 transition-transform duration-700 ease-[0.22,1,0.36,1]">
                         <span className="text-amber-400 text-xs font-bold uppercase tracking-widest block mb-3">{activeItem.category}</span>
