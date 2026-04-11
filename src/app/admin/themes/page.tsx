@@ -34,10 +34,12 @@ export default function AdminThemesPage() {
   };
 
   const activateTheme = async (id: string) => {
-    // Deactivate all first
-    await supabase.from("theme_presets").update({ is_active: false }).neq("id", "none");
-    // Activate selected
-    await supabase.from("theme_presets").update({ is_active: true }).eq("id", id);
+    // Use server-side API route (service_role key) to bypass RLS
+    await fetch("/api/admin/themes", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ themeId: id }),
+    });
     loadThemes();
   };
 

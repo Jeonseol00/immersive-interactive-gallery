@@ -42,18 +42,30 @@ export default function AdminGalleryPage() {
   };
 
   const togglePublish = async (id: string, current: boolean) => {
-    await supabase.from("gallery_items").update({ is_published: !current }).eq("id", id);
+    await fetch("/api/admin/gallery", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, updates: { is_published: !current } }),
+    });
     loadItems();
   };
 
   const toggleFeatured = async (id: string, current: boolean) => {
-    await supabase.from("gallery_items").update({ is_featured: !current }).eq("id", id);
+    await fetch("/api/admin/gallery", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, updates: { is_featured: !current } }),
+    });
     loadItems();
   };
 
   const deleteItem = async (id: string, title: string) => {
     if (!confirm(`Hapus karya "${title}"? Aksi ini tidak bisa dibatalkan.`)) return;
-    await supabase.from("gallery_items").delete().eq("id", id);
+    await fetch("/api/admin/gallery", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
     loadItems();
   };
 
