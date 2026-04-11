@@ -9,6 +9,7 @@ import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { GlobalBackground } from "@/components/ui/GlobalBackground";
 import { Footer } from "@/components/layout/Footer";
 import { AICuratorChat } from "@/components/ui/AICuratorChat";
+import { PublicShell } from "@/components/layout/PublicShell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,17 +55,23 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black text-white selection:bg-amber-500/30">
-        <GlobalBackground />
-        <CustomCursor />
-        <Preloader />
-        <ScrollProgress />
+        <PublicShell>
+          <GlobalBackground />
+          <CustomCursor />
+          <Preloader />
+          <ScrollProgress />
+        </PublicShell>
         
         <SmoothScrollWrapper>
-          <Navbar />
+          <PublicShell>
+            <Navbar />
+          </PublicShell>
           <main className="flex-1 w-full relative z-10">
             {children}
           </main>
-          <Footer />
+          <PublicShell>
+            <Footer />
+          </PublicShell>
         </SmoothScrollWrapper>
         <AICuratorChat />
       </body>
