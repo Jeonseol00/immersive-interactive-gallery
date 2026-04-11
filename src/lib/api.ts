@@ -1,61 +1,49 @@
-import { GalleryResponse, GalleryItem } from "@/types";
+import { GalleryItem, GalleryResponse } from '@/types';
+import { mockGalleryData } from './data';
 
-const IS_BROWSER = typeof window !== "undefined";
-const API_BASE_URL = IS_BROWSER
-  ? "/api/gallery"
-  : `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/gallery`;
+const API_BASE = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-import { mockGalleryData } from "@/lib/data";
+/**
+ * Fetch gallery items with Supabase-first, mock-data fallback.
+ * Used by Server Components and generateStaticParams.
+ */
+export async function fetchGalleryItems(): Promise<GalleryItem[]> {
+  // During build time, use mock data directly
+  if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+    return mockGalleryData;
+  }
 
-export async function fetchGalleryItems(
-  page: number = 1,
-  limit: number = 10
-): Promise<GalleryItem[]> {
   try {
-    // Di lingkungan produksi/build, bypass request HTTP absolut.
-    if (typeof window === "undefined") {
-      return mockGalleryData;
-    }
-
-    const res = await fetch(`${API_BASE_URL}?page=${page}&limit=${limit}`, {
+    const res = await fetch(`${API_BASE}/api/gallery?page=1&limit=50`, {
       next: { revalidate: 60 },
     });
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch gallery items: ${res.statusText}`);
-    }
-
-    const data: GalleryResponse & { success: boolean; galleryItems: GalleryItem[] } = await res.json();
+    if (!res.ok) throw new Error('API error');
+    const data: GalleryResponse = await res.json();
     return data.galleryItems || [];
-  } catch (error) {
-    console.error(error);
+  } catch {
+    console.warn('[API] fetchGalleryItems failed, using mock data');
     return mockGalleryData;
   }
 }
 
-export async function fetchGalleryItemBySlug(
-  slug: string
-): Promise<GalleryItem | null> {
-  try {
-    if (typeof window === "undefined") {
-      return mockGalleryData.find(item => item.slug === slug) || null;
-    }
+/**
+ * Fetch a single gallery item by slug.
+ */
+export async function fetchGalleryItemBySlug(slug: string): Promise<GalleryItem | null> {
+  // During build time, use mock data directly
+  if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+    return mockGalleryData.find(item => item.slug === slug) || null;
+  }
 
-    const res = await fetch(`${API_BASE_URL}/${slug}`, {
+  try {
+    const res = await fetch(`${API_BASE}/api/gallery/${slug}`, {
       next: { revalidate: 60 },
     });
-    
-    if (res.ok) {
-        const data = await res.json();
-        return data.item || null;
-    }
-    
-    // Fallback if [slug] route doesn't exist yet but we need it.
-    console.warn("Falling back to fetching all items because slug route failed");
-    return mockGalleryData.find(item => item.slug === slug) || null;
-
-  } catch (error) {
-    console.error(error);
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    return data.item || null;
+  } catch {
+    console.warn('[API] fetchGalleryItemBySlug failed, using mock data');
     return mockGalleryData.find(item => item.slug === slug) || null;
   }
 }

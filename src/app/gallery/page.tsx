@@ -7,7 +7,7 @@ export const metadata = {
 };
 
 export default async function GalleryPage() {
-  const items = await fetchGalleryItems(1, 100);
+  const items = await fetchGalleryItems();
 
   return <GalleryGridClient initialItems={items} />;
 }

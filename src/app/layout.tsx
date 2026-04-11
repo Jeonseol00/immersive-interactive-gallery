@@ -8,6 +8,7 @@ import { Preloader } from "@/components/ui/Preloader";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { GlobalBackground } from "@/components/ui/GlobalBackground";
 import { Footer } from "@/components/layout/Footer";
+import { AICuratorChat } from "@/components/ui/AICuratorChat";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -65,6 +66,7 @@ export default function RootLayout({
           </main>
           <Footer />
         </SmoothScrollWrapper>
+        <AICuratorChat />
       </body>
     </html>
   );
