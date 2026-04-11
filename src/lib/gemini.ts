@@ -42,7 +42,7 @@ Jangan tambahkan teks lain selain JSON.`;
     : `Analisis karya seni ini. URL gambar: ${imageUrl}`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     contents: [{ role: "user", parts: [{ text: userPrompt }] }],
     config: {
       systemInstruction: systemPrompt,
@@ -90,7 +90,7 @@ Pedoman:
 6. Jawab ringkas (maks 3-4 kalimat) kecuali diminta penjelasan detail.`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     contents: [{ role: "user", parts: [{ text: userMessage }] }],
     config: {
       systemInstruction: systemPrompt,
