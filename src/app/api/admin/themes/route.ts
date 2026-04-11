@@ -17,8 +17,8 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Database not configured" }, { status: 500 });
     }
 
-    // Deactivate all themes
-    await supabase.from("theme_presets").update({ is_active: false }).neq("id", "none");
+    // Deactivate all currently active themes
+    await supabase.from("theme_presets").update({ is_active: false }).eq("is_active", true);
 
     // Activate selected theme
     const { error } = await supabase
