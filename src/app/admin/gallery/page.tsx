@@ -14,6 +14,7 @@ interface GalleryRow {
   image_url: string;
   is_published: boolean;
   is_featured: boolean;
+  is_featured_waterfall: boolean;
   created_at: string;
 }
 
@@ -55,6 +56,15 @@ export default function AdminGalleryPage() {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, updates: { is_featured: !current } }),
+    });
+    loadItems();
+  };
+
+  const toggleWaterfall = async (id: string, current: boolean) => {
+    await fetch("/api/admin/waterfall", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, is_featured_waterfall: !current }),
     });
     loadItems();
   };
@@ -144,6 +154,13 @@ export default function AdminGalleryPage() {
                         className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${item.is_featured ? "bg-amber-500/10 text-amber-400" : "bg-neutral-500/10 text-neutral-500"}`}
                       >
                         {item.is_featured ? "⭐" : "☆"}
+                      </button>
+                      <button
+                        onClick={() => toggleWaterfall(item.id, item.is_featured_waterfall)}
+                        className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${item.is_featured_waterfall ? "bg-cyan-500/10 text-cyan-400" : "bg-neutral-500/10 text-neutral-500"}`}
+                        title="Toggle Waterfall"
+                      >
+                        {item.is_featured_waterfall ? "🌊" : "💤"}
                       </button>
                     </div>
                   </td>

@@ -8,6 +8,7 @@ interface Stats {
   totalWorks: number;
   totalCategories: number;
   featuredWorks: number;
+  waterfallWorks: number;
   recentTitle: string;
 }
 
@@ -44,6 +45,7 @@ export default function AdminDashboardPage() {
         totalWorks: items.length,
         totalCategories: categories.size,
         featuredWorks: items.filter((i) => i.is_featured).length,
+        waterfallWorks: items.filter((i) => i.is_featured_waterfall).length,
         recentTitle: items[0]?.title || "-",
       });
       setLoading(false);
@@ -64,6 +66,7 @@ export default function AdminDashboardPage() {
     { label: "Total Karya", value: stats?.totalWorks ?? 0, icon: "🖼️" },
     { label: "Kategori", value: stats?.totalCategories ?? 0, icon: "📂" },
     { label: "Karya Unggulan", value: stats?.featuredWorks ?? 0, icon: "⭐" },
+    { label: "Waterfall Aktif", value: stats?.waterfallWorks ?? 0, icon: "🌊" },
     { label: "Karya Terbaru", value: stats?.recentTitle ?? "-", icon: "🕐" },
   ];
 
@@ -94,6 +97,12 @@ export default function AdminDashboardPage() {
             className="bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-colors"
           >
             + Tambah Karya Baru
+          </button>
+          <button
+            onClick={() => router.push("/admin/waterfall")}
+            className="bg-cyan-500/10 border border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-colors"
+          >
+            🌊 Atur Waterfall
           </button>
           <button
             onClick={() => router.push("/admin/themes")}

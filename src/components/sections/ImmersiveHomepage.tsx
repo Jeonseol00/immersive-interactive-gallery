@@ -16,9 +16,10 @@ const MotionLink = motion.create(Link);
 
 interface ImmersiveHomepageProps {
   items: GalleryItemType[];
+  waterfallItems: GalleryItemType[];
 }
 
-export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
+export function ImmersiveHomepage({ items, waterfallItems }: ImmersiveHomepageProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -59,17 +60,20 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Use waterfall items for hero & showcase, fallback to regular items if empty
+  const effectiveWaterfall = waterfallItems.length > 0 ? waterfallItems : items;
+  
   // Prepare scattered items for Hero background (Desktop Only) — statis & tersebar penuh layar
   const heroScatteredItems = useMemo(() => {
     const result = [];
     for (let i = 0; i < 8; i++) {
-      result.push(items[i % items.length]);
+      result.push(effectiveWaterfall[i % effectiveWaterfall.length]);
     }
     return result;
-  }, [items]);
+  }, [effectiveWaterfall]);
 
-  // Showcased items for the curated list (6 items)
-  const showcaseItems = useMemo(() => items.slice(0, 6), [items]);
+  // Showcased items for the curated list (6 items from waterfall)
+  const showcaseItems = useMemo(() => effectiveWaterfall.slice(0, 6), [effectiveWaterfall]);
   const activeItem = showcaseItems[activeIndex] || items[0];
 
   useEffect(() => {
@@ -350,7 +354,7 @@ export function ImmersiveHomepage({ items }: ImmersiveHomepageProps) {
           </div>
 
           <div className="flex flex-col gap-1 pointer-events-auto border-b border-white/10 pb-6 mb-2">
-            {items.slice(0, 6).map((item, idx) => {
+            {showcaseItems.map((item, idx) => {
               const isActive = activeIndex === idx;
               return (
                 <button

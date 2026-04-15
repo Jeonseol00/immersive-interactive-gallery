@@ -1,4 +1,4 @@
-import { fetchGalleryItemBySlug } from "@/lib/api";
+import { fetchGalleryItemBySlug, fetchGalleryItems } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { GalleryDetailClient } from "./GalleryDetailClient";
 import type { Metadata } from "next";
@@ -32,15 +32,29 @@ export default async function GalleryDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = await params;
-  const item = await fetchGalleryItemBySlug(resolvedParams.slug);
+  const [item, allItems] = await Promise.all([
+    fetchGalleryItemBySlug(resolvedParams.slug),
+    fetchGalleryItems(),
+  ]);
 
   if (!item) {
     notFound();
   }
 
+  // Get related items (same category first, then others), excluding current
+  const relatedItems = allItems
+    .filter((g) => g.id !== item.id)
+    .sort((a, b) => {
+      if (a.category === item.category && b.category !== item.category) return -1;
+      if (a.category !== item.category && b.category === item.category) return 1;
+      return 0;
+    })
+    .slice(0, 3);
+
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
-      <GalleryDetailClient item={item} />
+      <GalleryDetailClient item={item} relatedItems={relatedItems} />
     </div>
   );
 }
+

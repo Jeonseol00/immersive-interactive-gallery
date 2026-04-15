@@ -20,7 +20,8 @@ function getClient(): GoogleGenAI {
  * Used in the admin dashboard during upload flow.
  */
 export async function generateArtDescription(
-  imageUrl: string,
+  imageBase64: string,
+  mimeType: string,
   userTitle?: string
 ): Promise<{ description: string; suggestedCategory: string; suggestedTitle: string }> {
   const ai = getClient();
@@ -38,26 +39,41 @@ Format output HARUS berupa JSON valid:
 Jangan tambahkan teks lain selain JSON.`;
 
   const userPrompt = userTitle
-    ? `Analisis karya seni ini. Judul sementara: "${userTitle}". URL gambar: ${imageUrl}`
-    : `Analisis karya seni ini. URL gambar: ${imageUrl}`;
+    ? `Analisis karya seni visual ini. Judul sementara dari pembuat: "${userTitle}".`
+    : `Analisis karya seni visual ini.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+    contents: [
+      {
+        role: "user",
+        parts: [
+          { inlineData: { data: imageBase64, mimeType } },
+          { text: userPrompt },
+        ],
+      },
+    ],
     config: {
       systemInstruction: systemPrompt,
       temperature: 0.7,
-      maxOutputTokens: 500,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: "OBJECT",
+        properties: {
+          description: { type: "STRING" },
+          suggestedCategory: { type: "STRING" },
+          suggestedTitle: { type: "STRING" }
+        },
+        required: ["description", "suggestedCategory", "suggestedTitle"]
+      }
     },
   });
 
   try {
-    const text = response.text ?? "";
-    // Extract JSON from response (handle markdown code blocks)
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON found in response");
-    return JSON.parse(jsonMatch[0]);
-  } catch {
+    const text = response.text ?? "{}";
+    return JSON.parse(text);
+  } catch (err) {
+    console.error("[Gemini JSON Error]", err, "Raw response:", response?.text);
     return {
       description: "Sebuah mahakarya visual yang memadukan elemen klasik dengan sentuhan kontemporer.",
       suggestedCategory: "Fine Art",

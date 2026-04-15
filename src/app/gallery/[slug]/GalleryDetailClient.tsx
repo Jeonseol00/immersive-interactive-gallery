@@ -5,9 +5,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { mockGalleryData } from "@/lib/data";
 
-export function GalleryDetailClient({ item }: { item: GalleryItem }) {
+export function GalleryDetailClient({ item, relatedItems }: { item: GalleryItem; relatedItems: GalleryItem[] }) {
   const MotionImage = motion.create(Image);
 
   return (
@@ -103,9 +102,7 @@ export function GalleryDetailClient({ item }: { item: GalleryItem }) {
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {mockGalleryData
-                .filter(g => g.id !== item.id)
-                .slice(0, 3)
+              {relatedItems
                 .map((related) => (
                   <Link key={related.id} href={`/gallery/${related.slug}`} className="group relative aspect-[4/5] rounded-[1.5rem] overflow-hidden block shadow-lg border border-white/5">
                      <Image src={related.images.thumbnail} alt="" fill className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />

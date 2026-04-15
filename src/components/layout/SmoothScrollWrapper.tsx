@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { usePathname, useSearchParams } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -13,6 +14,8 @@ export function SmoothScrollWrapper({
 }) {
   const prefersReducedMotion = useReducedMotion();
   const lenisRef = useRef<Lenis | null>(null);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -31,18 +34,39 @@ export function SmoothScrollWrapper({
     });
     lenisRef.current = lenis;
 
-    function raf(time: number) {
-      lenis.raf(time);
-      ScrollTrigger.update();
-      requestAnimationFrame(raf);
-    }
+    // Synchronize Lenis with ScrollTrigger
+    lenis.on('scroll', ScrollTrigger.update);
 
-    requestAnimationFrame(raf);
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+
+    gsap.ticker.lagSmoothing(0);
+
+    // Observer to detect content height changes (filtering, image loading, etc.)
+    const resizeObserver = new ResizeObserver(() => {
+      lenis.resize();
+    });
+    
+    resizeObserver.observe(document.body);
 
     return () => {
       lenis.destroy();
+      resizeObserver.disconnect();
+      gsap.ticker.remove(() => {});
     };
   }, [prefersReducedMotion]);
+
+  // Reset scroll and recalculate on route change
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+      // Small timeout to ensure Next.js has swapped the components
+      setTimeout(() => {
+        lenisRef.current?.resize();
+      }, 100);
+    }
+  }, [pathname, searchParams]);
 
   return <>{children}</>;
 }

@@ -32,6 +32,26 @@ export async function PUT(request: Request) {
   }
 }
 
+export async function POST(request: Request) {
+  try {
+    const data = await request.json();
+    
+    const supabase = createServerClient();
+    if (!supabase) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+    }
+
+    const { error } = await supabase.from("gallery_items").insert(data);
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("[Gallery Admin POST Error]", error);
+    return NextResponse.json({ error: "Failed to insert gallery item" }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: Request) {
   try {
     const { id } = await request.json();

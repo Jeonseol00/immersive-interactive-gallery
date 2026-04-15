@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { chatWithCurator } from "@/lib/gemini";
 import { createServerClient } from "@/lib/supabase/server";
-import { mockGalleryData } from "@/lib/data";
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
-    // Build gallery context from Supabase or fallback
+    // Build gallery context from Supabase
     let galleryContext = "";
     const supabase = createServerClient();
 
@@ -29,11 +28,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Fallback to mock data
     if (!galleryContext) {
-      galleryContext = mockGalleryData
-        .map((item) => `- "${item.title}" (${item.category}) oleh ${item.metadata.author}: ${item.interactions.accordionDescription}`)
-        .join("\n");
+      galleryContext = "Galeri saat ini sedang dalam proses pembaruan data.";
     }
 
     const response = await chatWithCurator(message, galleryContext);

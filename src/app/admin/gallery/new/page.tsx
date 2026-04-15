@@ -88,24 +88,31 @@ export default function AdminNewGalleryPage() {
       const d = gcd(width, height);
       const aspectRatio = `${width / d}/${height / d}`;
 
-      // 4. Insert to database
-      const { error: dbError } = await supabase.from("gallery_items").insert({
-        title,
-        slug,
-        category: category || "Uncategorized",
-        description: description || "",
-        image_url: imageUrl,
-        thumbnail_url: imageUrl,
-        alt_text: title,
-        width,
-        height,
-        aspect_ratio: aspectRatio,
-        is_published: true,
-        is_featured: false,
-        sort_order: 0,
+      // 4. Insert to database via API (to bypass RLS for authenticated admins)
+      const res = await fetch("/api/admin/gallery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          slug,
+          category: category || "Uncategorized",
+          description: description || "",
+          image_url: imageUrl,
+          thumbnail_url: imageUrl,
+          alt_text: title,
+          width,
+          height,
+          aspect_ratio: aspectRatio,
+          is_published: true,
+          is_featured: false,
+          sort_order: 0,
+        }),
       });
 
-      if (dbError) throw dbError;
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Gagal menyimpan ke database.");
+      }
 
       router.push("/admin/gallery");
       router.refresh();
