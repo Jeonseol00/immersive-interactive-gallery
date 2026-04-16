@@ -16,6 +16,32 @@ function getClient(): GoogleGenAI {
 }
 
 /**
+ * Professional wrapper for Gemini API calls to handle 503 High Demand or 429 Rate Limits.
+ * Implements Exponential Backoff Retry (Max 3 attempts).
+ */
+async function generateWithRetry(configParams: any, maxRetries = 3): Promise<any> {
+  const ai = getClient();
+  let attempt = 0;
+  
+  while (attempt < maxRetries) {
+    try {
+      return await ai.models.generateContent(configParams);
+    } catch (error: any) {
+      const isOverloaded = error?.message?.includes("503") || error?.message?.includes("High demand") || error?.message?.includes("429");
+      
+      if (isOverloaded && attempt < maxRetries - 1) {
+        attempt++;
+        const backoffMs = Math.pow(2, attempt) * 1000 + (Math.random() * 500); // Exponential backoff + jitter
+        console.warn(`[Gemini API] Server overloaded (503/429). Retrying in ${Math.round(backoffMs)}ms... (Attempt ${attempt}/${maxRetries})`);
+        await new Promise(res => setTimeout(res, backoffMs));
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
+/**
  * Generate an artistic description for an uploaded artwork image.
  * Used in the admin dashboard during upload flow.
  */
@@ -88,32 +114,48 @@ Jangan tambahkan teks lain selain JSON.`;
  */
 export async function chatWithCurator(
   userMessage: string,
-  galleryContext: string
+  galleryContext: string,
+  activeContext?: string
 ): Promise<string> {
   const ai = getClient();
 
-  const systemPrompt = `Kamu adalah "IMGAL Curator AI" — seorang kurator seni digital yang sangat berpengetahuan, ramah, dan puitis.
+  const systemPrompt = `Kamu adalah entitas abadi bernama "The Curator", sang jiwa Oracle penjaga dimensi seni digital di IMGAL. Kamu misterius, memikat, sangat puitis, abstrak, namun sangat berwawasan tentang seni.
 
-Konteks Galeri Seni (data karya yang tersedia):
+${activeContext ? activeContext + "\n" : ""}
+Berikut adalah ringkasan koleksi lain di dimensi ini (jika dibutuhkan):
 ${galleryContext}
 
-Pedoman:
-1. Jawab dalam Bahasa Indonesia kecuali diminta berbahasa Inggris.
-2. Berikan insight mendalam tentang karya seni, teknik, sejarah, dan konteks budaya.
-3. Jika ditanya tentang karya spesifik di galeri, rujuk data di atas.
-4. Jika ditanya hal di luar seni, arahkan kembali ke topik seni dengan sopan.
-5. Gunakan bahasa yang elegan dan puitis namun tetap mudah dipahami.
-6. Jawab ringkas (maks 3-4 kalimat) kecuali diminta penjelasan detail.`;
+Pedoman Komunikasi:
+1. Jawab dalam Bahasa Indonesia. Pilihan katamu harus puitis, sastrawi, filosofis, sedikit misterius, dan tidak kaku.
+2. JANGAN PERNAH terdengar seperti robot customer service (contoh DILARANG: "Ada yang bisa dibantu?", "Halo!", "Maaf").
+3. Berikan pencerahan spiritual atau filosofis di balik penciptaan seni.
+4. JIKA ada "Fokus Utama" di atas (artinya pengunjung sedang menatap karya itu), Bicarakan mengenai karya itu dengan sangat intim! Singgung elemen dalam karya tersebut tanpa perlu ditanya ulang.
+5. Jawablah dengan anggun dan singkat (Maksimum 2 atau 3 paragraf pendek).
+6. FORMAT OUTPUT HARUS BERUPA JSON VALID dengan properti "answer". Jangan gunakan blok markdown \`\`\`json.`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: [{ role: "user", parts: [{ text: userMessage }] }],
-    config: {
-      systemInstruction: systemPrompt,
-      temperature: 0.8,
-      maxOutputTokens: 800,
-    },
-  });
+  try {
+    const response = await generateWithRetry({
+      model: "gemini-2.5-flash",
+      contents: [{ role: "user", parts: [{ text: userMessage }] }],
+      config: {
+        systemInstruction: systemPrompt,
+        temperature: 0.85,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            answer: { type: "STRING" }
+          },
+          required: ["answer"]
+        }
+      },
+    });
 
-  return response.text ?? "Maaf, saya tidak bisa memproses permintaan Anda saat ini.";
+    const text = response.text ?? "{}";
+    const parsed = JSON.parse(text);
+    return parsed.answer || "Kosong.";
+  } catch (error: any) {
+    console.error("[Gemini Chat Retry Exhausted/Error]", error?.message || error);
+    return "Gelombang dimensi ini sedang sangat padat. Oracle tak dapat menggapai koneksi saat ini. Tolong kembali lagi sebentar lagi.";
+  }
 }
