@@ -3,13 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SmoothScrollWrapper } from "@/components/layout/SmoothScrollWrapper";
 import { Navbar } from "@/components/layout/Navbar";
-import { CustomCursor } from "@/components/ui/CustomCursor";
 import { Preloader } from "@/components/ui/Preloader";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { GlobalBackground } from "@/components/ui/GlobalBackground";
 import { Footer } from "@/components/layout/Footer";
-import { AICuratorChat } from "@/components/ui/AICuratorChat";
 import { PublicShell } from "@/components/layout/PublicShell";
+import { LazyAICurator } from "@/components/ui/LazyAICurator";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,7 +56,6 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-black text-white selection:bg-amber-500/30">
         <PublicShell>
           <GlobalBackground />
-          <CustomCursor />
           <Preloader />
           <ScrollProgress />
         </PublicShell>
@@ -73,7 +71,7 @@ export default function RootLayout({
             <Footer />
           </PublicShell>
         </SmoothScrollWrapper>
-        <AICuratorChat />
+        <LazyAICurator />
       </body>
     </html>
   );

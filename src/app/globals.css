@@ -19,6 +19,59 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   GPU-Accelerated Keyframes: Compositor Thread Animations
+   These run independently from JS main thread for 60fps performance.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Dust Particles — Float upward with gentle horizontal drift */
+@keyframes dust-rise {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-120vh) translateX(var(--dust-drift, 0px));
+    opacity: 0;
+  }
+}
+
+/* Orb 1 — Top-left ambient float */
+@keyframes float-orb-1 {
+  0%, 100% { transform: translate(-5%, -5%) scale(1); }
+  50% { transform: translate(15%, 15%) scale(1.3); }
+}
+
+/* Orb 2 — Bottom-right ambient float */
+@keyframes float-orb-2 {
+  0%, 100% { transform: translate(10%, 5%) scale(1); }
+  50% { transform: translate(-15%, -10%) scale(1.4); }
+}
+
+/* Orb 3 — Center ambient float */
+@keyframes float-orb-3 {
+  0%, 100% { transform: translate(-8%, 8%) scale(1); }
+  50% { transform: translate(8%, -8%) scale(1.2); }
+}
+
+/* Shuffle Cards — Gentle floating hover */
+@keyframes card-float {
+  0% { transform: translateY(-4%) translateX(-2%) rotate(-2deg); }
+  100% { transform: translateY(4%) translateX(2%) rotate(2deg); }
+}
+
+/* Ken Burns — Slow cinematic zoom for hero images */
+@keyframes ken-burns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

@@ -137,12 +137,10 @@ export function ImmersiveHomepage({ items, waterfallItems }: ImmersiveHomepagePr
                 className="w-full h-full absolute inset-0"
                 style={{ willChange: "transform" }}
              >
-                 {/* THE ENDLESS BREATH: Ken burns berjalan paralel di dalamnya */}
-                 <motion.div 
-                   initial={{ scale: 1 }}
-                   animate={{ scale: 1.05 }}
-                   transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
-                   className="w-full h-full relative origin-center"
+                 {/* THE ENDLESS BREATH: Ken burns via CSS (GPU-only, no JS) */}
+                 <div 
+                   className="w-full h-full relative origin-center animate-[ken-burns_25s_ease-in-out_infinite_alternate]"
+                   style={{ backfaceVisibility: "hidden", willChange: "transform" }}
                  >
                     <Image 
                       src={items[0].images.fullResolution} 
@@ -152,7 +150,7 @@ export function ImmersiveHomepage({ items, waterfallItems }: ImmersiveHomepagePr
                       priority
                       sizes="100vw"
                     />
-                 </motion.div>
+                 </div>
              </motion.div>
              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-neutral-950/40 mix-blend-multiply" />
              <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-transparent" />
@@ -232,18 +230,18 @@ export function ImmersiveHomepage({ items, waterfallItems }: ImmersiveHomepagePr
                 whileTap={{ scale: 0.96 }}
                 className="w-full relative aspect-[4/5] sm:aspect-[3/4] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl block group pointer-events-auto cursor-pointer border border-white/10"
               >
-                <motion.div layoutId={`gallery-image-${item.id}`} className="w-full h-full relative">
+                <div className="w-full h-full relative">
                   <Image
                     src={item.images.fullResolution}
                     alt={item.title}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    className="object-cover"
                     priority={idx === 0}
                     sizes="(max-width: 768px) 100vw"
                   />
                   {/* Internal Vignette */}
                   <div className="absolute inset-0 bg-neutral-900/10 mix-blend-overlay pointer-events-none"></div>
-                </motion.div>
+                </div>
                 
                 {/* Touch Overlay Indicator */}
                 <div className="absolute top-4 right-4 bg-black/60 backdrop-blur text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase opacity-90 pointer-events-none ring-1 ring-white/20">
@@ -425,15 +423,9 @@ export function ImmersiveHomepage({ items, waterfallItems }: ImmersiveHomepagePr
                     className="absolute inset-0 origin-center pointer-events-none"
                     style={{ willChange: "transform, opacity" }}
                   >
-                    <motion.div
-                       animate={{ 
-                         y: ["-4%", "4%"],
-                         x: ["-2%", "2%"],
-                         rotate: [-2, 2],
-                       }}
-                       transition={{ duration: 4 + index * 0.5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-                       className="relative w-full h-full overflow-hidden rounded-[2rem] border border-white/20 mix-blend-luminosity shadow-2xl"
-                       style={{ willChange: "transform" }}
+                    <div
+                       className="relative w-full h-full overflow-hidden rounded-[2rem] border border-white/20 mix-blend-luminosity shadow-2xl animate-[card-float_4s_ease-in-out_infinite_alternate]"
+                       style={{ willChange: "transform", animationDuration: `${4 + index * 0.5}s`, backfaceVisibility: "hidden" }}
                     >
                       <Image
                         src={item.images.thumbnail}
@@ -443,7 +435,7 @@ export function ImmersiveHomepage({ items, waterfallItems }: ImmersiveHomepagePr
                         sizes="20vw"
                         quality={30}
                       />
-                    </motion.div>
+                    </div>
                   </motion.div>
                 );
               })}

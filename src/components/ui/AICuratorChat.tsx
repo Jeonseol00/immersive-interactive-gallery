@@ -29,7 +29,7 @@ export function AICuratorChat() {
       {/* Mystical Glowing Orb Trigger */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-8 right-8 z-[9999] w-14 h-14 rounded-full flex items-center justify-center cursor-none md:cursor-pointer p-0 border-0 outline-none mix-blend-screen overflow-hidden"
+        className="fixed bottom-8 right-8 z-[9999] w-14 h-14 rounded-full flex items-center justify-center cursor-pointer p-0 border-0 outline-none mix-blend-screen overflow-hidden"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
       >
