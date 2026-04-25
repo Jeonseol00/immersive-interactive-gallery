@@ -35,7 +35,7 @@ export default function AdminDashboardPage() {
         .order("created_at", { ascending: false });
 
       if (error || !items) {
-        setStats({ totalWorks: 0, totalCategories: 0, featuredWorks: 0, recentTitle: "-" });
+        setStats({ totalWorks: 0, totalCategories: 0, featuredWorks: 0, waterfallWorks: 0, recentTitle: "-" });
         setLoading(false);
         return;
       }

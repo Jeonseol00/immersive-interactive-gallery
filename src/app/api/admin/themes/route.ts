@@ -1,15 +1,33 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { verifyAdminAuth, isAuthError } from "@/lib/auth-guard";
 
 /**
+ * ═══════════════════════════════════════════════════════
+ * Admin Theme API — HARDENED
+ * ═══════════════════════════════════════════════════════
+ * 
  * PUT: Activate a theme preset by ID.
- * Uses service_role key — bypasses RLS.
+ * 
+ * Security:
+ *   ✅ Server-side authentication via verifyAdminAuth()
+ *   ✅ UUID format validation
+ *   ✅ Uses service_role key — bypasses RLS (only after auth)
  */
 export async function PUT(request: Request) {
+  // ─── AUTH CHECK ────────────────────────────────────────
+  const auth = await verifyAdminAuth(request);
+  if (isAuthError(auth)) return auth;
+
   try {
     const { themeId } = await request.json();
-    if (!themeId) {
-      return NextResponse.json({ error: "themeId is required" }, { status: 400 });
+    if (!themeId || typeof themeId !== "string") {
+      return NextResponse.json({ error: "themeId (string) is required" }, { status: 400 });
+    }
+
+    // Validate UUID format
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(themeId)) {
+      return NextResponse.json({ error: "Invalid themeId format" }, { status: 400 });
     }
 
     const supabase = createServerClient();
