@@ -10,9 +10,9 @@ interface ThemeColors {
 }
 
 const defaultTheme: ThemeColors = {
-  orb1: "rgba(245,158,11,0.4)",
-  orb2: "rgba(6,182,212,0.25)",
-  orb3: "rgba(159,18,57,0.15)",
+  orb1: "rgba(245,158,11,0.15)",
+  orb2: "rgba(6,182,212,0.08)",
+  orb3: "rgba(159,18,57,0.06)",
   grainOpacity: 0.03,
 };
 
@@ -136,15 +136,15 @@ export function GlobalBackground() {
         {/* Colors from Theme Preset                                   */}
         {/* ═══════════════════════════════════════════════════════════ */}
         <div 
-          className="absolute -top-[15%] -left-[5%] w-[65vw] md:w-[55vw] h-[65vw] md:h-[55vw] rounded-full blur-[100px] z-20 transition-colors duration-[3000ms] animate-[float-orb-1_18s_ease-in-out_infinite]"
+          className="absolute -top-[15%] -left-[5%] w-[50vw] md:w-[40vw] h-[50vw] md:h-[40vw] rounded-full blur-[140px] z-20 transition-colors duration-[3000ms] animate-[float-orb-1_18s_ease-in-out_infinite]"
           style={{ background: theme.orb1, willChange: "transform", backfaceVisibility: "hidden" }}
         />
         <div 
-          className="absolute -bottom-[15%] -right-[5%] w-[65vw] md:w-[55vw] h-[65vw] md:h-[55vw] rounded-full blur-[100px] z-20 transition-colors duration-[3000ms] animate-[float-orb-2_22s_ease-in-out_infinite]"
+          className="absolute -bottom-[15%] -right-[5%] w-[50vw] md:w-[40vw] h-[50vw] md:h-[40vw] rounded-full blur-[140px] z-20 transition-colors duration-[3000ms] animate-[float-orb-2_22s_ease-in-out_infinite]"
           style={{ background: theme.orb2, willChange: "transform", backfaceVisibility: "hidden" }}
         />
         <div 
-          className="absolute top-[30%] left-[25%] w-[50vw] md:w-[40vw] h-[50vw] md:h-[40vw] rounded-full blur-[120px] z-20 transition-colors duration-[3000ms] animate-[float-orb-3_25s_ease-in-out_infinite]"
+          className="absolute top-[30%] left-[25%] w-[40vw] md:w-[30vw] h-[40vw] md:h-[30vw] rounded-full blur-[150px] z-20 transition-colors duration-[3000ms] animate-[float-orb-3_25s_ease-in-out_infinite]"
           style={{ background: theme.orb3, willChange: "transform", backfaceVisibility: "hidden" }}
         />
       </div>
