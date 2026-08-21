@@ -20,10 +20,6 @@ export default function AdminThemesPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    loadThemes();
-  }, []);
-
   const loadThemes = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { router.push("/admin/login"); return; }
@@ -32,6 +28,11 @@ export default function AdminThemesPage() {
     setThemes(data || []);
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadThemes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const activateTheme = async (id: string) => {
     // Use server-side API route (service_role key) to bypass RLS

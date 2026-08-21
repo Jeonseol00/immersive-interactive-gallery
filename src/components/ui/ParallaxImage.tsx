@@ -8,6 +8,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { cn } from "@/lib/utils";
 
+// Extracted to module scope to prevent static component creation during render
+const MotionImage = motion.create(Image);
+
 interface ParallaxImageProps {
   src: string;
   alt: string;
@@ -68,17 +71,13 @@ export function ParallaxImage({
     return () => ctx.revert();
   }, [parallaxSpeed, prefersReducedMotion]);
 
-  // Use motion.img but with next/image inside, or just motion.div wrapping next/image? 
-  // Custom framer-motion with next/image
-  const MotionImage = motion.create(Image);
-
   return (
     <div
       ref={containerRef}
       className={cn("relative overflow-hidden w-full h-full", className)}
     >
       <MotionImage
-        ref={imageRef as any}
+        ref={imageRef as React.Ref<HTMLImageElement>}
         src={src}
         alt={alt}
         width={width}

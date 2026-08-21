@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import "./src/env";
 
 /**
  * ═══════════════════════════════════════════════════════
@@ -13,13 +14,20 @@ import type { NextConfig } from "next";
  */
 
 const nextConfig: NextConfig = {
+  // Standalone output for Docker multi-stage builds
+  output: "standalone",
+
   // Disable X-Powered-By header — reduces information leakage
   poweredByHeader: false,
 
   images: {
     formats: ['image/avif', 'image/webp'],
     qualities: [30, 40, 75],
-    minimumCacheTTL: 60,
+    // Cache optimized images for 24 hours to reduce repeated upstream fetches
+    minimumCacheTTL: 86400,
+    // Reduce device sizes to minimize upstream fetch variants
+    deviceSizes: [640, 1080, 1920],
+    imageSizes: [128, 256, 384],
     remotePatterns: [
       {
         protocol: 'https',
@@ -29,10 +37,6 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Dev origins from environment — don't hardcode internal IPs in committed config
-  allowedDevOrigins: process.env.ALLOWED_DEV_ORIGINS
-    ? process.env.ALLOWED_DEV_ORIGINS.split(',').map(s => s.trim())
-    : [],
 
   // Security headers as a defense-in-depth layer
   // (Primary headers are set in middleware.ts for full coverage)

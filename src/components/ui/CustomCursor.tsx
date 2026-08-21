@@ -107,6 +107,7 @@ export function CustomCursor() {
       observer.disconnect();
       cleanupListeners();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   if (!isPointerDevice || !isVisible) return null;

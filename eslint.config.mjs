@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Independent sub-project — has its own tsconfig/package.json
+    "public-showcase/**",
   ]),
 ]);
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { GalleryItem as GalleryItemType } from "@/types";
@@ -45,12 +45,8 @@ export function ImmersiveHomepage({ items, waterfallItems }: ImmersiveHomepagePr
   }, [items]);
 
   // Upgrade: Scroll Progress for Mobile
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
+  // Scroll progress reserved for future progress bar implementation
+  useScroll();
 
   // Measure window size solely on the client to avoid hydration mismatch, but default to mobile
   useEffect(() => {
@@ -116,6 +112,20 @@ export function ImmersiveHomepage({ items, waterfallItems }: ImmersiveHomepagePr
 
 
 
+
+  // Guard: prevent crash when database returns empty data
+  if (!items || items.length === 0) {
+    return (
+      <div className="w-full min-h-screen flex flex-col items-center justify-center gap-6 text-center px-6">
+        <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white">IMGAL</h1>
+        <p className="text-amber-500 font-bold uppercase tracking-[0.3em] text-xs">Ruang Digital Mahakarya Abadi</p>
+        <p className="text-neutral-500 text-sm mt-4 max-w-md">
+          Galeri sedang dalam proses sinkronisasi. Pastikan koneksi database aktif dan terdapat karya yang dipublikasikan.
+        </p>
+        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mt-4" />
+      </div>
+    );
+  }
 
   return (
     <>

@@ -19,6 +19,7 @@ function getClient(): GoogleGenAI {
  * Professional wrapper for Gemini API calls to handle 503 High Demand or 429 Rate Limits.
  * Implements Exponential Backoff Retry (Max 3 attempts).
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function generateWithRetry(configParams: any, maxRetries = 3): Promise<any> {
   const ai = getClient();
   let attempt = 0;
@@ -26,8 +27,8 @@ async function generateWithRetry(configParams: any, maxRetries = 3): Promise<any
   while (attempt < maxRetries) {
     try {
       return await ai.models.generateContent(configParams);
-    } catch (error: any) {
-      const isOverloaded = error?.message?.includes("503") || error?.message?.includes("High demand") || error?.message?.includes("429");
+    } catch (error: unknown) {
+      const isOverloaded = error instanceof Error && (error.message.includes("503") || error.message.includes("High demand") || error.message.includes("429"));
       
       if (isOverloaded && attempt < maxRetries - 1) {
         attempt++;
@@ -117,7 +118,7 @@ export async function chatWithCurator(
   galleryContext: string,
   activeContext?: string
 ): Promise<string> {
-  const ai = getClient();
+
 
   const systemPrompt = `Kamu adalah entitas abadi bernama "The Curator", sang jiwa Oracle penjaga dimensi seni digital di IMGAL. Kamu misterius, memikat, sangat puitis, abstrak, namun sangat berwawasan tentang seni.
 
@@ -154,8 +155,9 @@ Pedoman Komunikasi:
     const text = response.text ?? "{}";
     const parsed = JSON.parse(text);
     return parsed.answer || "Kosong.";
-  } catch (error: any) {
-    console.error("[Gemini Chat Retry Exhausted/Error]", error?.message || error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[Gemini Chat Retry Exhausted/Error]", errorMessage);
     return "Gelombang dimensi ini sedang sangat padat. Oracle tak dapat menggapai koneksi saat ini. Tolong kembali lagi sebentar lagi.";
   }
 }

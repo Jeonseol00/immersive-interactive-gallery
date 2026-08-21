@@ -1,0 +1,74 @@
+[
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/app/about/AboutClient.tsx",
+    "messages": []
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/app/admin/gallery/page.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/immutability",
+        "message": "Error: Cannot access variable before it is declared\n\n`loadItems` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\n/home/titiw/Downloads/ReadyProject/webgallery/src/app/admin/gallery/page.tsx:29:5\n  27 |\n  28 |   useEffect(() => {\n> 29 |     loadItems();\n     |     ^^^^^^^^^ `loadItems` accessed before it is declared\n  30 |   }, []);\n  31 |\n  32 |   const loadItems = async () => {\n\n/home/titiw/Downloads/ReadyProject/webgallery/src/app/admin/gallery/page.tsx:32:3\n  30 |   }, []);\n  31 |\n> 32 |   const loadItems = async () => {\n     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 33 |     const { data: { session } } = await supabase.auth.getSession();\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 34 |     if (!session) { router.push(\"/admin/login\"); return; }\n     …\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 42 |     setLoading(false);\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 43 |   };\n     | ^^^^^ `loadItems` is declared here\n  44 |\n  45 |   const togglePublish = async (id: string, current: boolean) => {\n  46 |     await fetch(\"/api/admin/gallery\", {",
+        "line": 29
+      }
+    ]
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/app/admin/layout.tsx",
+    "messages": []
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/app/admin/themes/page.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/immutability",
+        "message": "Error: Cannot access variable before it is declared\n\n`loadThemes` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\n/home/titiw/Downloads/ReadyProject/webgallery/src/app/admin/themes/page.tsx:24:5\n  22 |\n  23 |   useEffect(() => {\n> 24 |     loadThemes();\n     |     ^^^^^^^^^^ `loadThemes` accessed before it is declared\n  25 |   }, []);\n  26 |\n  27 |   const loadThemes = async () => {\n\n/home/titiw/Downloads/ReadyProject/webgallery/src/app/admin/themes/page.tsx:27:3\n  25 |   }, []);\n  26 |\n> 27 |   const loadThemes = async () => {\n     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 28 |     const { data: { session } } = await supabase.auth.getSession();\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 29 |     if (!session) { router.push(\"/admin/login\"); return; }\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 30 |\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 31 |     const { data } = await supabase.from(\"theme_presets\").select(\"*\").order(\"created_at\");\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 32 |     setThemes(data || []);\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 33 |     setLoading(false);\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 34 |   };\n     | ^^^^^ `loadThemes` is declared here\n  35 |\n  36 |   const activateTheme = async (id: string) => {\n  37 |     // Use server-side API route (service_role key) to bypass RLS",
+        "line": 24
+      }
+    ]
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/app/admin/waterfall/page.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/immutability",
+        "message": "Error: Cannot access variable before it is declared\n\n`loadData` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\n/home/titiw/Downloads/ReadyProject/webgallery/src/app/admin/waterfall/page.tsx:27:5\n  25 |\n  26 |   useEffect(() => {\n> 27 |     loadData();\n     |     ^^^^^^^^ `loadData` accessed before it is declared\n  28 |   }, []);\n  29 |\n  30 |   const loadData = async () => {\n\n/home/titiw/Downloads/ReadyProject/webgallery/src/app/admin/waterfall/page.tsx:30:3\n  28 |   }, []);\n  29 |\n> 30 |   const loadData = async () => {\n     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 31 |     const { data: { session } } = await supabase.auth.getSession();\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 32 |     if (!session) { router.push(\"/admin/login\"); return; }\n     …\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 50 |     setLoading(false);\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 51 |   };\n     | ^^^^^ `loadData` is declared here\n  52 |\n  53 |   const activeCount = items.filter((i) => i.is_featured_waterfall).length;\n  54 |",
+        "line": 27
+      }
+    ]
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/app/gallery/[slug]/GalleryDetailClient.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/static-components",
+        "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\n/home/titiw/Downloads/ReadyProject/webgallery/src/app/gallery/[slug]/GalleryDetailClient.tsx:22:10\n  20 |           <ArrowLeft size={24} />\n  21 |         </Link>\n> 22 |         <MotionImage\n     |          ^^^^^^^^^^^ This component is created during render\n  23 |           layoutId={`gallery-image-${item.id}`}\n  24 |           transition={{ type: \"spring\", stiffness: 300, damping: 30 }}\n  25 |           src={item.images.fullResolution || item.images.thumbnail}\n\n/home/titiw/Downloads/ReadyProject/webgallery/src/app/gallery/[slug]/GalleryDetailClient.tsx:10:23\n   8 |\n   9 | export function GalleryDetailClient({ item, relatedItems }: { item: GalleryItem; relatedItems: GalleryItem[] }) {\n> 10 |   const MotionImage = motion.create(Image);\n     |                       ^^^^^^^^^^^^^^^^^^^^ The component is created during render here\n  11 |\n  12 |   return (\n  13 |     <div className=\"pb-24\">",
+        "line": 22
+      }
+    ]
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/components/layout/Footer.tsx",
+    "messages": []
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/components/layout/Navbar.tsx",
+    "messages": []
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/components/sections/ImmersiveHomepage.tsx",
+    "messages": []
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/components/ui/AICuratorChat.tsx",
+    "messages": []
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/components/ui/CustomCursor.tsx",
+    "messages": []
+  },
+  {
+    "filePath": "/home/titiw/Downloads/ReadyProject/webgallery/src/components/ui/Preloader.tsx",
+    "messages": []
+  }
+]

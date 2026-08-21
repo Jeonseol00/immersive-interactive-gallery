@@ -23,10 +23,6 @@ export default function AdminWaterfallPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { router.push("/admin/login"); return; }
@@ -49,6 +45,11 @@ export default function AdminWaterfallPage() {
     if (settingsRow) setWaterfallLimit(parseInt(settingsRow.value, 10));
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const activeCount = items.filter((i) => i.is_featured_waterfall).length;
 

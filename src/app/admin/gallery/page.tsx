@@ -25,10 +25,6 @@ export default function AdminGalleryPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    loadItems();
-  }, []);
-
   const loadItems = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { router.push("/admin/login"); return; }
@@ -41,6 +37,11 @@ export default function AdminGalleryPage() {
     setItems(data || []);
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const togglePublish = async (id: string, current: boolean) => {
     await fetch("/api/admin/gallery", {

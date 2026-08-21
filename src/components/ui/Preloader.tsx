@@ -13,9 +13,12 @@ export function Preloader() {
   const timersRef = useRef<NodeJS.Timeout[]>([]);
   const phaseStartedRef = useRef(false);
 
-  // Fetch gallery images for the reel phase
+  // Fetch gallery images for the reel phase (with 5s timeout to avoid blocking)
   useEffect(() => {
-    fetch("/api/gallery?page=1&limit=10")
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    fetch("/api/gallery?page=1&limit=10", { signal: controller.signal })
       .then((res) => res.json())
       .then((data) => {
         const items = data.galleryItems || data.items || [];
@@ -25,18 +28,23 @@ export function Preloader() {
         }
       })
       .catch(() => {
-        // Fallback: reel will just be skipped if images fail
-      });
+        // Fallback: reel will just be skipped if images fail or timeout
+      })
+      .finally(() => clearTimeout(timeoutId));
   }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // Capture ref value for stable cleanup reference
+    const timers = timersRef.current;
 
     // Session check — only show once per tab session
     const SEEN_KEY = "preloader_complete_v6";
     try {
       const hasLoaded = sessionStorage.getItem(SEEN_KEY);
       if (hasLoaded) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPhase("exit");
         return;
       }
@@ -63,13 +71,13 @@ export function Preloader() {
         const t1 = setTimeout(() => {
           setPhase("text");
         }, 600);
-        timersRef.current.push(t1);
+        timers.push(t1);
 
         // Text phase lasts 3 seconds, then → reel phase
         const t2 = setTimeout(() => {
           setPhase("reel");
         }, 600 + 3000);
-        timersRef.current.push(t2);
+        timers.push(t2);
 
         // Reel phase lasts 2.5 seconds, then → exit
         const t3 = setTimeout(() => {
@@ -83,14 +91,14 @@ export function Preloader() {
             window.dispatchEvent(new Event("preloader_finished"));
           }
         }, 600 + 3000 + 2500);
-        timersRef.current.push(t3);
+        timers.push(t3);
       }
     }, 100);
 
     return () => {
       if (!phaseStartedRef.current) {
         clearInterval(interval);
-        timersRef.current.forEach(clearTimeout);
+        timers.forEach(clearTimeout);
         document.body.style.overflow = "";
       }
     };

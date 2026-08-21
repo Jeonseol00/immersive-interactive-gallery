@@ -38,6 +38,7 @@ export function GlobalBackground() {
   const [particleCount, setParticleCount] = useState(30);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
 
     // Adaptive Quality: detect low-end devices
@@ -49,10 +50,13 @@ export function GlobalBackground() {
       }
     }
 
-    // Fetch active theme from Supabase (with graceful fallback)
+    // Fetch active theme from Supabase (with 5s timeout + graceful fallback)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     const loadTheme = async () => {
       try {
-        const res = await fetch("/api/theme");
+        const res = await fetch("/api/theme", { signal: controller.signal });
         if (res.ok) {
           const data = await res.json();
           if (data.orb1_color) {
@@ -66,6 +70,8 @@ export function GlobalBackground() {
         }
       } catch {
         // Fallback to defaults — no problem
+      } finally {
+        clearTimeout(timeoutId);
       }
     };
 

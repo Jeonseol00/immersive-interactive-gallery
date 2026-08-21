@@ -1,9 +1,9 @@
 "use client";
 
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useEffect, useState } from "react";
+import { useRef } from "react";
 
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 

@@ -6,9 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export function GalleryDetailClient({ item, relatedItems }: { item: GalleryItem; relatedItems: GalleryItem[] }) {
-  const MotionImage = motion.create(Image);
+// Extracted to module scope to prevent static component creation during render
+const MotionImage = motion.create(Image);
 
+export function GalleryDetailClient({ item, relatedItems }: { item: GalleryItem; relatedItems: GalleryItem[] }) {
   return (
     <div className="pb-24">
       {/* Hero Image transitioning from thumbnail */}

@@ -45,6 +45,7 @@ export function useAICurator() {
         currentAudio.current = null;
       }
       ttsQueue.current = [];
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsSpeaking(false);
     }
   }, [isOpen]);
